@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>في رحاب حفظ القرآن الكريم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --lav:#c9bdf0;
+    --sky:#a9d8ec;
+    --mint:#b7ecd4;
+    --ink:#232042;
+    --ink-soft:#5b5678;
+    --card:#ffffffcc;
+    --card-solid:#ffffff;
+    --line:#e7e3f5;
+    --grad: linear-gradient(120deg, #b7ecd4 0%, #a9d8ec 55%, #c9bdf0 100%);
+    --grad-soft: linear-gradient(120deg, #e9fbf1 0%, #e6f4fb 55%, #f1ecfc 100%);
+    --shadow: 0 20px 60px -20px rgba(76, 58, 128, 0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    font-family:'Tajawal', sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 15% 10%, #d9cdf7 0%, transparent 45%),
+      radial-gradient(circle at 85% 0%, #aee0ee 0%, transparent 40%),
+      radial-gradient(circle at 50% 100%, #bdf0d9 0%, transparent 45%),
+      #eef1fb;
+    background-attachment: fixed;
+    padding: 56px 20px 90px;
+    overflow-x:hidden;
+  }
+  .glow{
+    position:fixed; border-radius:50%; filter:blur(70px); opacity:.55; z-index:0; pointer-events:none;
+  }
+  .glow.a{width:420px;height:420px; top:-120px; left:-100px; background:#c9bdf0;}
+  .glow.b{width:380px;height:380px; bottom:-140px; right:-120px; background:#a9d8ec;}
+  .glow.c{width:300px;height:300px; top:40%; right:10%; background:#b7ecd4; opacity:.35;}
+
+  .wrap{ position:relative; z-index:1; max-width:640px; margin:0 auto; display:flex; flex-direction:column; gap:28px;}
+
+  /* ---- HERO ---- */
+  .hero{
+    background: var(--card);
+    backdrop-filter: blur(18px);
+    border:1px solid var(--line);
+    border-radius:28px;
+    padding:44px 36px 40px;
+    text-align:center;
+    box-shadow: var(--shadow);
+    animation: rise .7s ease both;
+  }
+  .hero-icon{
+    width:64px;height:64px;border-radius:18px;margin:0 auto 18px;
+    display:flex;align-items:center;justify-content:center;
+    background: var(--grad-soft);
+    font-size:30px;
+    box-shadow: inset 0 0 0 1px #ffffffaa;
+  }
+  .hero h1{
+    font-family:'Amiri', serif;
+    font-size:28px;
+    margin: 0 0 16px;
+    color: var(--ink);
+  }
+  .hero p{
+    font-size:15px;
+    line-height: 2;
+    color: var(--ink-soft);
+    margin: 0 0 26px;
+  }
+  .hero p b{ color:var(--ink); font-weight:700;}
+  .cta{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:14px 30px;
+    border:none; border-radius:16px;
+    font-family:'Tajawal', sans-serif;
+    font-size:15px; font-weight:700;
+    color:#1c3b33;
+    background: var(--grad);
+    cursor:pointer;
+    box-shadow: 0 12px 28px -10px rgba(120, 200, 180, .6);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .cta:hover{ transform: translateY(-2px); box-shadow: 0 16px 34px -10px rgba(120,200,180,.75);}
+  .cta:active{ transform: translateY(0px) scale(.98); }
+
+  /* ---- FORM CARD ---- */
+  .card{
+    background: var(--card-solid);
+    border:1px solid var(--line);
+    border-radius:28px;
+    padding:36px;
+    box-shadow: var(--shadow);
+    animation: rise .7s .1s ease both;
+  }
+  .card h2{
+    font-family:'Amiri', serif;
+    font-size:24px; margin:0 0 8px;
+  }
+  .card > p.sub{
+    font-size:14px; color:var(--ink-soft); margin:0 0 30px; line-height:1.9;
+  }
+
+  .field{ margin-bottom:26px; }
+  .field-label{
+    display:flex; align-items:center; gap:8px;
+    font-size:14px; font-weight:700; color:var(--ink);
+    margin-bottom:10px;
+  }
+  .field-label .em{ font-size:16px; }
+
+  input[type="text"], input[type="date"], select{
+    width:100%;
+    padding:13px 14px;
+    border-radius:14px;
+    border:1.5px solid var(--line);
+    background:#faf9ff;
+    font-family:'Tajawal', sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    outline:none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+    appearance: none;
+    -webkit-appearance:none;
+  }
+  select{
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'><path d='M1 1l6 6 6-6' stroke='%235b5678' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat:no-repeat;
+    background-position: left 14px center;
+    padding-left: 34px;
+  }
+  input:focus, select:focus{
+    border-color:#a9d8ec;
+    box-shadow: 0 0 0 4px #a9d8ec33;
+  }
+
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .hijri-row{ display:grid; grid-template-columns: 1.3fr 1.6fr 1fr; gap:10px; margin-top:10px; }
+  .hint{ font-size:12px; color:#9691b0; margin-top:8px; }
+
+  .segmented{
+    display:flex; gap:10px;
+  }
+  .seg-btn{
+    flex:1;
+    padding:12px 10px;
+    text-align:center;
+    border-radius:14px;
+    border:1.5px solid var(--line);
+    background:#faf9ff;
+    font-family:'Tajawal', sans-serif;
+    font-size:13.5px; font-weight:600;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition: all .18s ease;
+  }
+  .seg-btn.active{
+    background: var(--grad);
+    border-color: transparent;
+    color:#1c3b33;
+    box-shadow: 0 8px 20px -8px rgba(120,200,180,.6);
+  }
+  .seg-btn:hover:not(.active){ border-color:#c9bdf0; }
+
+  .path-target{ margin-top:14px; }
+  .path-target select{ margin-top: 0; }
+
+  .followup-note{
+    margin-top:14px;
+    font-size:12.5px;
+    color:#1c3b33;
+    background: var(--grad-soft);
+    border:1px solid #cdeede;
+    padding:10px 14px;
+    border-radius:12px;
+    display:none;
+  }
+  .followup-note.show{ display:block; }
+
+  .save-btn{
+    width:100%;
+    margin-top:6px;
+    padding:15px;
+    border:none;
+    border-radius:16px;
+    font-family:'Tajawal', sans-serif;
+    font-size:15px; font-weight:800;
+    color:#fff;
+    background: linear-gradient(120deg, #6a5acd, #4c3a80);
+    cursor:pointer;
+    box-shadow: 0 14px 30px -10px rgba(76,58,128,.55);
+    transition: transform .18s ease;
+  }
+  .save-btn:hover{ transform: translateY(-2px); }
+  .save-btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+
+  .summary{
+    margin-top:18px;
+    font-size:13px;
+    color:var(--ink-soft);
+    background:#faf9ff;
+    border:1px dashed var(--line);
+    border-radius:14px;
+    padding:14px 16px;
+    line-height:2;
+    display:none;
+  }
+  .summary.show{ display:block; }
+  .summary b{ color:var(--ink); }
+
+  @keyframes rise{
+    from{ opacity:0; transform: translateY(18px);}
+    to{ opacity:1; transform: translateY(0);}
+  }
+
+  @media (max-width:520px){
+    .row2, .hijri-row{ grid-template-columns:1fr; }
+    .card, .hero{ padding:28px 22px; border-radius:22px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .hero, .card{ animation:none; }
+    .cta, .save-btn{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow a"></div>
+<div class="glow b"></div>
+<div class="glow c"></div>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-icon">📖</div>
+    <h1>في رحاب حفظ القرآن الكريم</h1>
+    <p>
+      رحلة حفظ القرآن الكريم ليست سباقًا، بل رحلة مباركة نخطو فيها كل يوم خطوة جديدة، ونقترب مع كل آية من كتاب الله،
+      قال رسول الله ﷺ: <b>«يُقال لصاحبِ القرآنِ: اقرأ وارتقِ ورتِّل كما كنتَ ترتِّلُ في الدنيا، فإنَّ منزلتَك عندَ آخرِ آيةٍ تقرؤُها»</b>
+    </p>
+    <button class="cta" onclick="document.getElementById('setupCard').scrollIntoView({behavior:'smooth'})">
+      ومن هنا تبدأ رحلتك في رحاب القرآن ✨
+    </button>
+  </section>
+
+  <!-- SETUP FORM -->
+  <section class="card" id="setupCard">
+    <h2>إعداد رحلتك</h2>
+    <p class="sub">حدّد تفاصيل رحلتك في رحاب القرآن الكريم، ويمكنك تعديلها لاحقًا في أي وقت.</p>
+
+    <form id="planForm">
+
+      <!-- اسم الخطة -->
+      <div class="field">
+        <div class="field-label">اسم الخطة</div>
+        <input type="text" id="planName" placeholder="الخطة الأولى">
+      </div>
+
+      <!-- التواريخ -->
+      <div class="field">
+        <div class="row2">
+          <div>
+            <div class="field-label"><span class="em">📅</span> تاريخ البداية (ميلادي)</div>
+            <input type="date" id="startDateG">
+          </div>
+          <div>
+            <div class="field-label"><span class="em">📅</span> تاريخ النهاية (ميلادي)</div>
+            <input type="date" id="endDateG">
+          </div>
+        </div>
+        <div class="hint">أدخل التاريخ الهجري مباشرةً (اختياري)</div>
+        <div class="hijri-row">
+          <select id="hijriDay"><option value="">اليوم</option></select>
+          <select id="hijriMonth">
+            <option value="">الشهر</option>
+            <option>محرم</option><option>صفر</option><option>ربيع الأول</option><option>ربيع الآخر</option>
+            <option>جمادى الأولى</option><option>جمادى الآخرة</option><option>رجب</option><option>شعبان</option>
+            <option>رمضان</option><option>شوال</option><option>ذو القعدة</option><option>ذو الحجة</option>
+          </select>
+          <select id="hijriYear"><option value="">السنة</option></select>
+        </div>
+      </div>
+
+      <!-- الهدف اليومي -->
+      <div class="field">
+        <div class="field-label"><span class="em">🎯</span> الهدف اليومي</div>
+        <div class="row2">
+          <div>
+            <div class="hint" style="margin:0 0 8px;">وحدة القياس</div>
+            <select id="unit">
+              <option value="جزء">جزء</option>
+              <option value="حزب">حزب</option>
+              <option value="وجه">وجه</option>
+            </select>
+          </div>
+          <div>
+            <div class="hint" style="margin:0 0 8px;">الكمية اليومية</div>
+            <select id="quantity">
+              <option value="0.5">0.5</option>
+              <option value="1" selected>1</option>
+              <option value="1.5">1.5</option>
+              <option value="2">2</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- مسار البداية -->
+      <div class="field">
+        <div class="field-label"><span class="em">🗺️</span> مسار البداية</div>
+        <div class="hint" style="margin-bottom:10px;">تصاعدي أو تنازلي</div>
+        <div class="segmented">
+          <div class="seg-btn active" data-dir="تصاعدي">تصاعدي</div>
+          <div class="seg-btn" data-dir="تنازلي">تنازلي</div>
+        </div>
+
+        <div class="path-target">
+          <div class="hint" style="margin-bottom:8px;">اختيار الجزء أو السورة</div>
+          <div class="segmented" style="margin-bottom:12px;">
+            <div class="seg-btn active" data-mode="جزء">جزء</div>
+            <div class="seg-btn" data-mode="سورة">سورة</div>
+          </div>
+          <select id="juzSelect"></select>
+          <select id="surahSelect" style="display:none;"></select>
+        </div>
+      </div>
+
+      <!-- نوع المتابعة -->
+      <div class="field">
+        <div class="field-label"><span class="em">📁</span> نوع المتابعة — اختيار واحد فقط</div>
+        <div class="segmented">
+          <div class="seg-btn" data-follow="الحفظ">الحفظ</div>
+          <div class="seg-btn" data-follow="المراجعة">المراجعة</div>
+          <div class="seg-btn" data-follow="ضبط التجويد">ضبط التجويد</div>
+        </div>
+        <div class="followup-note" id="followNote">نوع المتابعة عند الاختيار تصبح بهذا اللون</div>
+      </div>
+
+      <button type="submit" class="save-btn" id="saveBtn">💾 الحفظ</button>
+    </form>
+
+    <div class="summary" id="summary"></div>
+  </section>
+
+</div>
+
+<script>
+  const surahs = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس",
+  "هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه",
+  "الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم",
+  "لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر",
+  "فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق",
+  "الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة",
+  "الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الحاقة","المعارج",
+  "نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس",
+  "التكوير","الانفطار","المطففين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد",
+  "الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزال","العاديات",
+  "القارعة","التكاثر","العصر","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر",
+  "المسد","الإخلاص","الفلق","الناس"];
+
+  // populate hijri day (1-30) and year (reasonable range)
+  const dayEl = document.getElementById('hijriDay');
+  for(let i=1;i<=30;i++){ const o=document.createElement('option'); o.value=i; o.textContent=i; dayEl.appendChild(o); }
+  const yearEl = document.getElementById('hijriYear');
+  for(let y=1440;y<=1450;y++){ const o=document.createElement('option'); o.value=y; o.textContent=y; yearEl.appendChild(o); }
+
+  // populate juz select (1-30)
+  const juzEl = document.getElementById('juzSelect');
+  for(let i=1;i<=30;i++){ const o=document.createElement('option'); o.value=i; o.textContent="الجزء "+i; juzEl.appendChild(o); }
+
+  // populate surah select
+  const surahEl = document.getElementById('surahSelect');
+  surahs.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; surahEl.appendChild(o); });
+
+  let direction = "تصاعدي";
+  let targetMode = "جزء";
+  let followType = null;
+
+  // direction toggle
+  document.querySelectorAll('[data-dir]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('[data-dir]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      direction = btn.dataset.dir;
+      applyDirectionDefault();
+    });
+  });
+
+  // target mode toggle (جزء / سورة)
+  document.querySelectorAll('[data-mode]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('[data-mode]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      targetMode = btn.dataset.mode;
+      juzEl.style.display = targetMode === "جزء" ? "block" : "none";
+      surahEl.style.display = targetMode === "سورة" ? "block" : "none";
+      applyDirectionDefault();
+    });
+  });
+
+  function applyDirectionDefault(){
+    // per spec: تنازلي starts at الفاتحة، تصاعدي starts at الناس
+    if(targetMode === "سورة"){
+      surahEl.value = (direction === "تنازلي") ? "الفاتحة" : "الناس";
+    } else {
+      juzEl.value = (direction === "تنازلي") ? "1" : "30";
+    }
+  }
+  applyDirectionDefault();
+
+  // follow-up type (single select)
+  document.querySelectorAll('[data-follow]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('[data-follow]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      followType = btn.dataset.follow;
+      document.getElementById('followNote').classList.add('show');
+    });
+  });
+
+  document.getElementById('planForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const name = document.getElementById('planName').value || "الخطة الأولى";
+    const startG = document.getElementById('startDateG').value || "—";
+    const endG = document.getElementById('endDateG').value || "—";
+    const hDay = document.getElementById('hijriDay').value;
+    const hMonth = document.getElementById('hijriMonth').value;
+    const hYear = document.getElementById('hijriYear').value;
+    const hijri = (hDay && hMonth && hYear) ? `${hDay} ${hMonth} ${hYear}هـ` : "لم يُحدَّد";
+    const unit = document.getElementById('unit').value;
+    const qty = document.getElementById('quantity').value;
+    const target = targetMode === "جزء" ? ("الجزء " + juzEl.value) : surahEl.value;
+    const follow = followType || "لم يُحدَّد";
+
+    const summaryHTML = `
+      <b>اسم الخطة:</b> ${name}<br>
+      <b>تاريخ البداية:</b> ${startG} &nbsp;|&nbsp; <b>تاريخ النهاية:</b> ${endG}<br>
+      <b>التاريخ الهجري:</b> ${hijri}<br>
+      <b>الهدف اليومي:</b> ${qty} ${unit}<br>
+      <b>مسار البداية:</b> ${direction} — يبدأ من ${target}<br>
+      <b>نوع المتابعة:</b> ${follow}
+    `;
+    const summaryEl = document.getElementById('summary');
+    summaryEl.innerHTML = summaryHTML;
+    summaryEl.classList.add('show');
+    summaryEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+  });
+</script>
+
+</body>
+</html>
