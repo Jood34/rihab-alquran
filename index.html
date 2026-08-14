@@ -969,4 +969,14 @@ document.querySelectorAll('#fontChips .chip').forEach(chip=>{
   chip.addEventListener('click', ()=>{ document.querySelectorAll('#fontChips .chip').forEach(c=>c.classList.remove('active')); chip.classList.add('active'); document.documentElement.style.setProperty('--font-main', chip.dataset.font); });
 });
 document.getElementById('darkModeToggle').addEventListener('change', function(){
-  if(this.checked){ document.body.style.background = '#1c1a2b'; document.body.style.color = '#f0eefa'; }
+  if(this.checked){ 
+    document.body.style.background = '#1c1a2b'; 
+    document.body.style.color = '#f0eefa'; 
+  } else {
+    document.body.style.background = '';
+    document.body.style.color = '';
+  }
+});
+</script>
+</body>
+</html>
