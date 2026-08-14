@@ -89,16 +89,22 @@
   .summary.show{ display:block; }
   .summary b{ color:var(--ink); }
 
-  .context-label{ font-size:13px; font-weight:700; color:#2f8f6e; margin-bottom:6px; }
+  #page-home.home-centered{ justify-content:center; min-height: calc(100vh - 170px); }
+  .home-toolbar{ display:flex; align-items:center; justify-content:flex-end; margin-bottom:10px; }
+  .edit-plan-btn{ border:1.5px solid var(--line); background:#faf9ff; border-radius:12px; padding:8px 14px; font-size:12.5px; font-weight:700; cursor:pointer; font-family:var(--font-main); }
+  .edit-plan-btn:hover{ border-color:#c9bdf0; }
+  .plan-summary{ display:flex; flex-wrap:wrap; gap:10px; background:#faf9ff; border:1px solid var(--line); border-radius:14px; padding:12px 16px; font-size:12.5px; margin-bottom:16px; }
+  .summary-chip{ display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--line); border-radius:10px; padding:6px 12px; }
+  .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:16px; width:100%; }
+  table{ border-collapse:collapse; width:100%; min-width:680px; font-size:12.5px; table-layout:fixed; }
+  thead th{ background:#f4f2fb; padding:11px 9px; font-weight:800; border-bottom:1.5px solid var(--line); position:sticky; top:0; vertical-align:middle; line-height:1.4; }
+  tbody td{ padding:8px; border-bottom:1px solid var(--line); text-align:center; vertical-align:middle; line-height:1.4; height:52px; }
+  tbody td select, tbody td input{ height:38px; }
+  tbody td .ach-cell{ height:38px; }
   .motivate-box{ background: var(--grad-soft); border:1px solid #dfeff0; border-radius:16px; padding:14px 18px; text-align:center; font-size:13.5px; font-weight:700; margin-bottom:18px; }
   .tracking-toolbar{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
   .progress-pill{ background:#faf9ff; border:1.5px solid var(--line); border-radius:13px; padding:9px 16px; font-size:13px; }
   .progress-pill b{ color:#2f8f6e; font-size:14.5px; }
-  .plan-summary{ display:flex; flex-wrap:wrap; gap:10px 18px; background:#faf9ff; border:1px solid var(--line); border-radius:14px; padding:12px 16px; font-size:12.5px; margin-bottom:16px; }
-  .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:16px; margin:0 2px; }
-  table{ border-collapse:collapse; width:100%; min-width:680px; font-size:12.5px; }
-  thead th{ background:#f4f2fb; padding:11px 9px; font-weight:800; border-bottom:1.5px solid var(--line); position:sticky; top:0; }
-  tbody td{ padding:8px; border-bottom:1px solid var(--line); text-align:center; }
   tbody tr:hover{ background:#faf9ff; }
   .unit-cell{ font-weight:700; white-space:nowrap; }
   .note-input{ min-width:100px; padding:7px; font-size:12px; }
@@ -108,7 +114,7 @@
   .icon-btn:hover{ background:#efeaff; }
   td select{ font-size:11.5px; padding:7px 24px 7px 6px; min-width:120px; }
 
-  .confetti-piece{ position:fixed; width:6px;height:6px;border-radius:2px; pointer-events:none; z-index:999; animation:confettiFall .9s ease-out forwards;}
+  .confetti-piece{ position:fixed; width:6px;height:6px;border-radius:2px; pointer-events:none; z-index:999; animation:confettiFall 1s ease-out forwards;}
   @keyframes confettiFall{ from{ transform:translate(0,0) rotate(0); opacity:1;} to{ transform:translate(var(--dx),90px) rotate(220deg); opacity:0;} }
 
   .stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
@@ -217,7 +223,9 @@
     </section>
 
     <section class="card wide" id="homeTracking" style="display:none;">
-      <div class="context-label" id="trackingContextLabel">متابعة حفظ القرآن</div>
+      <div class="home-toolbar" id="editPlanToolbar" style="display:none;">
+        <button class="edit-plan-btn" id="editPlanBtn">✏️ تعديل الخطة</button>
+      </div>
       <div class="motivate-box" id="motivateText">—</div>
 
       <!-- quran general tracking -->
@@ -292,6 +300,10 @@
           <div class="stat-tile"><span class="em">⏳</span><div class="val" id="sqJuzLeft">30</div><div class="lbl">الأجزاء المتبقية</div></div>
           <div class="stat-tile"><span class="em">⏳</span><div class="val" id="sqHizbLeft">60</div><div class="lbl">الأحزاب المتبقية</div></div>
           <div class="stat-tile"><span class="em">⏳</span><div class="val" id="sqPagesLeft">604</div><div class="lbl">الصفحات المتبقية</div></div>
+        </div>
+        <div class="chart-block">
+          <h3>📘 تقدّم الأجزاء (مرّر للتفاصيل)</h3>
+          <div class="cal-grid" id="juzProgressGrid" style="grid-template-columns:repeat(10,1fr);"></div>
         </div>
         <div class="chart-block">
           <h3>🥧 توزيعات مستوى الإنجاز</h3>
@@ -413,29 +425,31 @@
         <button class="save-btn" id="settingsSaveBtn" type="button">💾 حفظ إعدادات الرحلة</button>
       </div>
 
-      <div class="settings-block"><h3>🏆 مستوى الحفظ</h3><div class="chip-row" id="chipsHifz"></div></div>
-      <div class="settings-block"><h3>🎯 مستوى الثبيت</h3><div class="chip-row" id="chipsThabit"></div></div>
-      <div class="settings-block"><h3>📿 مستوى التجويد</h3><div class="chip-row" id="chipsTajweed"></div></div>
+      <div id="settingsExtraBlocks">
+        <div class="settings-block"><h3>🏆 مستوى الحفظ</h3><div class="chip-row" id="chipsHifz"></div></div>
+        <div class="settings-block"><h3>🎯 مستوى الثبيت</h3><div class="chip-row" id="chipsThabit"></div></div>
+        <div class="settings-block"><h3>📿 مستوى التجويد</h3><div class="chip-row" id="chipsTajweed"></div></div>
 
-      <div class="settings-block">
-        <h3>🖋 الخط</h3>
-        <div class="chip-row" id="fontChips">
-          <div class="chip selectable active" data-font="'IBM Plex Sans Arabic', 'Tajawal', sans-serif">IBM Plex Sans Arabic</div>
-          <div class="chip selectable" data-font="'Cairo', sans-serif">Cairo</div>
-          <div class="chip selectable" data-font="'Tajawal', sans-serif">Tajawal</div>
+        <div class="settings-block">
+          <h3>🖋 الخط</h3>
+          <div class="chip-row" id="fontChips">
+            <div class="chip selectable active" data-font="'IBM Plex Sans Arabic', 'Tajawal', sans-serif">IBM Plex Sans Arabic</div>
+            <div class="chip selectable" data-font="'Cairo', sans-serif">Cairo</div>
+            <div class="chip selectable" data-font="'Tajawal', sans-serif">Tajawal</div>
+          </div>
+          <div class="toggle-row" style="margin-top:18px;">
+            <span>الوضع الليلي</span>
+            <label class="switch"><input type="checkbox" id="darkModeToggle"><span class="slider-tg"></span></label>
+          </div>
         </div>
-        <div class="toggle-row" style="margin-top:18px;">
-          <span>الوضع الليلي</span>
-          <label class="switch"><input type="checkbox" id="darkModeToggle"><span class="slider-tg"></span></label>
-        </div>
-      </div>
 
-      <div class="settings-block">
-        <div class="danger-zone">
-          <h3>⚠️ منطقة الخطر</h3>
-          <p class="desc">هذه الإجراءات لا يمكن التراجع عنها.</p>
-          <button class="danger-btn" onclick="if(confirm('هل أنت متأكد من حذف الإنجازات؟')) resetAchievements()">🗑️ حذف الإنجازات</button>
-          <button class="danger-btn" onclick="if(confirm('هل أنت متأكد من البدء من جديد؟')) location.reload()">🔄 البدء من جديد</button>
+        <div class="settings-block">
+          <div class="danger-zone">
+            <h3>⚠️ منطقة الخطر</h3>
+            <p class="desc">هذه الإجراءات لا يمكن التراجع عنها.</p>
+              <button class="danger-btn" onclick="if(confirm('هل أنت متأكد من حذف الإنجازات؟')) resetAchievements()">🗑️ حذف الإنجازات</button>
+            <button class="danger-btn" onclick="if(confirm('هل أنت متأكد من البدء من جديد؟')) location.reload()">🔄 البدء من جديد</button>
+          </div>
         </div>
       </div>
     </section>
@@ -471,6 +485,22 @@ const hizbRanges = [[1,10],[11,20],[21,30],[31,41],[42,51],[52,61],[62,71],[72,8
 
 function pageToJuz(p){ for(let i=0;i<juzRanges.length;i++){ if(p>=juzRanges[i][0]&&p<=juzRanges[i][1]) return i+1; } return null; }
 function pageToHizb(p){ for(let i=0;i<hizbRanges.length;i++){ if(p>=hizbRanges[i][0]&&p<=hizbRanges[i][1]) return i+1; } return null; }
+
+const juzSurahs = [
+["الفاتحة","البقرة"],["البقرة"],["البقرة","آل عمران"],["آل عمران","النساء"],["النساء"],
+["النساء","المائدة"],["المائدة","الأنعام"],["الأنعام","الأعراف"],["الأعراف","الأنفال"],["الأنفال","التوبة"],
+["التوبة","يونس","هود"],["هود","يوسف"],["يوسف","الرعد","إبراهيم"],["الحجر","النحل"],["الإسراء","الكهف"],
+["الكهف","مريم","طه"],["الأنبياء","الحج"],["المؤمنون","النور","الفرقان"],["الفرقان","الشعراء","النمل"],["النمل","القصص","العنكبوت"],
+["العنكبوت","الروم","لقمان","السجدة","الأحزاب"],["الأحزاب","سبأ","فاطر","يس"],["يس","الصافات","ص","الزمر"],["الزمر","غافر","فصلت"],["فصلت","الشورى","الزخرف","الدخان","الجاثية"],
+["الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات"],["الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد"],
+["المجادلة","الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم"],
+["الملك","القلم","الحاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات"],
+null // juz 30 handled specially below
+];
+function juzSurahList(n){
+  if(n===30){ const s=surahs.indexOf('النبأ'), e=surahs.indexOf('الناس'); return surahs.slice(s, e+1); }
+  return juzSurahs[n-1];
+}
 
 const motivations = [
 "ما حُفظ اليوم، ثبّته غدًا، حتى يبقى القرآن في صدرك.",
@@ -553,15 +583,20 @@ function setContext(ctx){
 }
 function renderHome(){
   const showTracking = homeMode === 'tracking' && activeContext;
+  document.getElementById('page-home').classList.toggle('home-centered', !showTracking);
   document.getElementById('homeHero').style.display = showTracking ? 'none' : 'block';
   document.getElementById('homeTracking').style.display = showTracking ? 'block' : 'none';
   if(!showTracking) return;
   const isQuran = activeContext === 'quran';
-  document.getElementById('trackingContextLabel').textContent = isQuran ? 'متابعة حفظ القرآن' : getPlan(activeContext).name;
   document.getElementById('quranTableArea').style.display = isQuran ? 'block' : 'none';
   document.getElementById('planTableArea').style.display = isQuran ? 'none' : 'block';
+  document.getElementById('editPlanToolbar').style.display = isQuran ? 'none' : 'flex';
   if(isQuran) buildQuranTable(); else buildPlanTable(getPlan(activeContext));
 }
+document.getElementById('editPlanBtn').addEventListener('click', ()=>{
+  creatingNewPlan = false;
+  showPage('settings');
+});
 document.getElementById('navQuran').dataset.context = 'quran';
 document.getElementById('navQuran').classList.add('context-pill');
 document.getElementById('navQuran').addEventListener('click', ()=> setContext('quran'));
@@ -578,6 +613,7 @@ function addPlanPill(plan){
   document.getElementById('planPills').appendChild(btn);
 }
 document.getElementById('motivateText').textContent = motivations[Math.floor(Math.random()*motivations.length)];
+renderHome();
 
 /* ================= HIJRI <-> GREGORIAN ================= */
 const hijriFmt = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {year:'numeric', month:'numeric', day:'numeric'});
@@ -643,9 +679,11 @@ function openNewPlanForm(){
   document.getElementById('settingsContextHint').textContent = 'إعداد خطة جديدة';
   document.getElementById('settingsSaveBtn').textContent = '💾 إنشاء الخطة';
   document.getElementById('settingsSaveBtn').disabled = false;
+  document.getElementById('settingsExtraBlocks').style.display = 'none';
   showPage('settings');
 }
 function loadSettingsForContext(){
+  document.getElementById('settingsExtraBlocks').style.display = 'block';
   const hint = document.getElementById('settingsContextHint');
   const saveBtn = document.getElementById('settingsSaveBtn');
   if(activeContext && activeContext.startsWith('plan:')){
@@ -774,7 +812,17 @@ function buildPlanSchedule(plan){
     let targetLabel = 'الخطة مكتملة 🎉';
     if(plan.targetMode === 'جزء'){
       const slice = sequence.slice(cursor, cursor+pagesPerDay); cursor += pagesPerDay;
-      if(slice.length){ const j1=pageToJuz(slice[0]), j2=pageToJuz(slice[slice.length-1]); targetLabel = (slice.length===1?`صفحة ${slice[0]}`:`صفحة ${slice[0]}-${slice[slice.length-1]}`) + ` (ج${j1}${j1!==j2?'-ج'+j2:''})`; }
+      if(slice.length){
+        const pageLabel = slice.length===1 ? `صفحة ${slice[0]}` : `صفحة ${slice[0]}-${slice[slice.length-1]}`;
+        if(plan.unit === 'حزب'){
+          const h1 = pageToHizb(slice[0]), h2 = pageToHizb(slice[slice.length-1]);
+          targetLabel = `الحزب ${h1}${h1!==h2?'-'+h2:''} (${pageLabel})`;
+        } else if(plan.unit === 'وجه'){
+          targetLabel = `${plan.qty} وجه (${pageLabel})`;
+        } else {
+          targetLabel = pageLabel;
+        }
+      }
     } else {
       const startIdx = surahs.indexOf(plan.rawTarget);
       const perDay = Math.max(1, Math.round(parseFloat(plan.qty)));
@@ -790,12 +838,22 @@ function buildPlanSchedule(plan){
   }
   planSchedules[plan.id] = rows;
 }
+function planTypeIcon(followType){
+  if(followType==='الحفظ') return '🧠';
+  if(followType==='المراجعة') return '🔁';
+  if(followType==='ضبط التجويد') return '⚙️';
+  return '📁';
+}
 function buildPlanTable(plan){
   if(!planSchedules[plan.id]) buildPlanSchedule(plan);
   const rows = planSchedules[plan.id];
   const total = rows.length, completed = rows.filter(r=>r.done).length;
   document.getElementById('planTableSummary').innerHTML =
-    `<span>الكل: ${total}</span><span>المتبقي: ${total-completed}</span><span>المكتمل: ${completed}</span><span>الأيام: ${completed}/${total}</span><span>نوع الخطة: ${escapeHtml(plan.unit)}</span>`;
+    `<span class="summary-chip">📊 الكل: ${total}</span>
+     <span class="summary-chip">⏳ المتبقي: ${total-completed}</span>
+     <span class="summary-chip">✅ المكتمل: ${completed}</span>
+     <span class="summary-chip">📅 الأيام: ${completed}/${total}</span>
+     <span class="summary-chip">${planTypeIcon(plan.followType)} نوع الخطة: ${escapeHtml(plan.followType)}</span>`;
   document.getElementById('planTableBody').innerHTML = rows.map((r,i)=>`<tr>
     <td>${i+1}</td><td>${r.date}</td><td>${r.dayName}</td><td>${escapeHtml(r.target)}</td>
     <td>${buildLevelSelect(levelsHifz,'hifz',i,r.hifz)}</td>
@@ -819,12 +877,13 @@ function buildPlanTable(plan){
 }
 function burstConfetti(el){
   const rect = el.getBoundingClientRect();
-  const colors = ['#b7ecd4','#a9d8ec','#c9bdf0','#ffd88a'];
-  for(let i=0;i<10;i++){
+  const colors = ['#b7ecd4','#a9d8ec','#c9bdf0','#ffd88a','#f7a8c4'];
+  for(let i=0;i<20;i++){
     const p = document.createElement('div'); p.className='confetti-piece';
     p.style.left = (rect.left + rect.width/2) + 'px'; p.style.top = rect.top + 'px';
-    p.style.background = colors[i%4]; p.style.setProperty('--dx', (Math.random()*80-40)+'px');
-    document.body.appendChild(p); setTimeout(()=>p.remove(), 900);
+    p.style.width = (5+Math.random()*4)+'px'; p.style.height = p.style.width;
+    p.style.background = colors[i%colors.length]; p.style.setProperty('--dx', (Math.random()*160-80)+'px');
+    document.body.appendChild(p); setTimeout(()=>p.remove(), 1000);
   }
 }
 
@@ -854,6 +913,15 @@ function refreshStats(){
     document.getElementById('sqJuzLeft').textContent = 30-juzDone;
     document.getElementById('sqHizbLeft').textContent = 60-hizbDone;
     document.getElementById('sqPagesLeft').textContent = 604-pagesDone;
+
+    const juzGrid = document.getElementById('juzProgressGrid');
+    juzGrid.innerHTML = juzRanges.map((rg,i)=>{
+      const n=i+1;
+      let done=true; for(let p=rg[0];p<=rg[1];p++){ if(!pageStore[p-1].done){done=false;break;} }
+      const names = juzSurahList(n).join('، ');
+      const title = `الجزء ${n}: ${names} — صفحة ${rg[0]}-${rg[1]}`;
+      return `<div class="cal-cell ${done?'done':''}" title="${escapeHtml(title)}" style="aspect-ratio:auto; padding:8px 2px;"><span class="g">${n}</span></div>`;
+    }).join('');
 
     const empty = pagesDone===0;
     document.getElementById('quranDonutEmpty').style.display = empty ? 'block':'none';
@@ -969,14 +1037,10 @@ document.querySelectorAll('#fontChips .chip').forEach(chip=>{
   chip.addEventListener('click', ()=>{ document.querySelectorAll('#fontChips .chip').forEach(c=>c.classList.remove('active')); chip.classList.add('active'); document.documentElement.style.setProperty('--font-main', chip.dataset.font); });
 });
 document.getElementById('darkModeToggle').addEventListener('change', function(){
-  if(this.checked){ 
-    document.body.style.background = '#1c1a2b'; 
-    document.body.style.color = '#f0eefa'; 
-  } else {
-    document.body.style.background = '';
-    document.body.style.color = '';
-  }
+  if(this.checked){ document.body.style.background = '#1c1a2b'; document.body.style.color = '#f0eefa'; }
+  else { document.body.style.background = ''; document.body.style.color = ''; }
 });
 </script>
+
 </body>
 </html>
