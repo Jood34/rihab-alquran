@@ -43,12 +43,13 @@
     border-bottom:1px solid var(--line);
     padding:12px 20px;
   }
+  .topnav.nav-hidden{ display:none; }
+  .brand{ font-weight:800; font-size:15px; display:flex; align-items:center; gap:6px; white-space:nowrap; cursor:pointer; border:none; background:none; color:var(--ink); font-family:var(--font-main); padding:0; }
   .nav-row{ max-width:1100px; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
   .nav-row.row1{ justify-content:space-between; padding-bottom:10px; }
   .nav-row.row2{ justify-content:flex-end; padding-bottom:8px; border-bottom:1px dashed var(--line); margin-bottom:8px; }
   .nav-row.row3{ justify-content:flex-end; }
   .plan-pills{ display:flex; flex-wrap:wrap; gap:8px; }
-  .brand{ font-weight:800; font-size:15px; display:flex; align-items:center; gap:6px; white-space:nowrap;}
   .pill{
     border:1.5px solid var(--line); background:#fff; color:var(--ink-soft);
     font-family:var(--font-main); font-size:13px; font-weight:700;
@@ -241,9 +242,9 @@
 
 <div class="glow a"></div><div class="glow b"></div><div class="glow c"></div>
 
-<nav class="topnav">
+<nav class="topnav nav-hidden" id="topNav">
   <div class="nav-row row1">
-    <div class="brand">🌱🏠 في رحاب القرآن الكريم</div>
+    <button class="brand" id="brandHome">🌱🏠 في رحاب القرآن الكريم</button>
     <button class="pill active-pill" data-page="home">🏠 الرئيسية</button>
   </div>
   <div class="nav-row row2">
@@ -701,6 +702,10 @@ function getPlan(ctx){
 function updateNavRow3(){
   document.getElementById('navRow3').style.display = plans.length>0 ? 'flex' : 'none';
 }
+function unlockNav(){
+  document.getElementById('topNav').classList.remove('nav-hidden');
+}
+document.getElementById('brandHome').addEventListener('click', ()=> showPage('home'));
 function addPlanPill(plan){
   const btn = document.createElement('button');
   btn.className = 'pill context-pill';
@@ -830,6 +835,7 @@ document.getElementById('planForm').addEventListener('submit', function(e){
   plans.push(plan);
   addPlanPill(plan);
   updateNavRow3();
+  unlockNav();
   document.getElementById('summary').innerHTML = `
     <b>اسم الخطة:</b> ${escapeHtml(plan.name)}<br>
     <b>تاريخ البداية:</b> ${plan.startG||'—'} &nbsp;|&nbsp; <b>تاريخ النهاية:</b> ${plan.endG||'—'}<br>
@@ -1052,3 +1058,7 @@ document.getElementById('darkModeToggle').addEventListener('change', function(){
     document.body.style.color = '';
   }
 });
+</script>
+
+</body>
+</html>
