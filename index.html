@@ -37,15 +37,12 @@
   /* ---- TOP NAV ---- */
   .topnav{ position:sticky; top:0; z-index:50; background:#ffffffee; backdrop-filter:blur(14px); border-bottom:1px solid var(--line); padding:12px 20px; }
   .topnav.nav-hidden{ display:none; }
-  .nav-row{ max-width:1100px; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
-  .nav-row.row1{ padding-bottom:10px; }
-  .nav-row.row2{ justify-content:space-between; gap:14px; }
+  .nav-row{ max-width:1200px; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+  .nav-row.single{ justify-content:flex-start; }
   .nav-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
   @media (max-width:760px){
     .topnav{ padding:10px 12px; }
-    .nav-row.row2{ flex-direction:column; align-items:stretch; gap:8px; }
-    .nav-row.row2 .nav-group{ justify-content:flex-start; }
-    .brand{ font-size:13.5px; }
+    .brand{ font-size:13.5px; width:100%; margin-bottom:4px; }
   }
   .brand{ font-weight:800; font-size:15px; display:flex; align-items:center; gap:8px; white-space:nowrap; cursor:pointer; border:none; background:none; color:var(--ink); font-family:var(--font-main); padding:0; }
   .brand .ic{ font-size:18px; }
@@ -54,7 +51,7 @@
   .pill.active-pill{ background: var(--grad); border-color:transparent; color:#1c3b33; box-shadow: 0 8px 18px -8px rgba(120,200,180,.55); }
   .pill.action{ background:#f4f2fb; border-style:dashed; }
 
-  .wrap{ position:relative; z-index:1; max-width:880px; margin:0 auto; padding:32px 20px 0; display:flex; flex-direction:column; gap:24px;}
+  .wrap{ position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:32px 24px 0; display:flex; flex-direction:column; gap:24px;}
 
   .page{ display:none; }
   .page.active{ display:flex; flex-direction:column; gap:22px; animation: rise .5s ease both; }
@@ -68,7 +65,7 @@
   .cta:hover{ transform: translateY(-2px); }
 
   .card{ background: var(--card-solid); border:1px solid var(--line); border-radius:24px; padding:30px; box-shadow: var(--shadow); max-width:600px; margin:0 auto; width:100%;}
-  .card.wide{ max-width:840px; }
+  .card.wide{ max-width:1140px; }
   .card h2{ font-size:21px; font-weight:700; margin:0 0 8px; }
   .card > p.sub{ font-size:13.5px; color:var(--ink-soft); margin:0 0 22px; line-height:1.9; }
 
@@ -148,7 +145,7 @@
   .confetti-piece{ position:fixed; top:-12px; width:6px;height:6px;border-radius:2px; pointer-events:none; z-index:999; animation:confettiSweep 1.3s ease-in forwards;}
   .confetti-piece.from-right{ right:-12px; }
   .confetti-piece.from-left{ left:-12px; }
-  @keyframes confettiSweep{ from{ transform:translateX(0) translateY(0) rotate(0); opacity:1;} to{ transform:translateX(var(--dx)) translateY(var(--dy)) rotate(260deg); opacity:0;} }
+  @keyframes confettiSweep{ from{ transform:translateX(0) translateY(0) rotate(var(--baseRot,0deg)); opacity:1;} to{ transform:translateX(var(--dx)) translateY(var(--dy)) rotate(calc(var(--baseRot,0deg) + 260deg)); opacity:0;} }
 
   .stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
   .stat-tile{ background:#faf9ff; border:1px solid var(--line); border-radius:15px; padding:16px 12px; text-align:center; }
@@ -159,6 +156,7 @@
   .chart-block{ background:#faf9ff; border:1px solid var(--line); border-radius:18px; padding:20px; margin-top:20px; }
   .chart-block h3{ font-size:14.5px; margin:0 0 14px; }
   .chart-empty{ text-align:center; font-size:12.5px; color:#9691b0; padding:24px 0; }
+  .chart-caption{ text-align:left; font-size:12px; color:var(--ink-soft); margin:8px 2px 0; }
   .donut-row{ display:flex; flex-wrap:wrap; gap:16px; }
   .donut-item{ flex:1; min-width:150px; text-align:center; }
   .donut-item p{ font-size:12px; font-weight:700; margin:8px 0 0; }
@@ -241,22 +239,16 @@
 <div class="glow a"></div><div class="glow b"></div><div class="glow c"></div>
 
 <nav class="topnav nav-hidden" id="topNav">
-  <div class="nav-row row1">
+  <div class="nav-row single">
     <button class="brand" id="brandHome">في رحاب القرآن الكريم <span class="ic">🏠</span></button>
-  </div>
-  <div class="nav-row row2">
-    <div class="nav-group">
-      <div class="nav-group" id="planPills"></div>
-      <button class="pill" id="navQuran">📋 متابعة حفظ القرآن</button>
-      <button class="pill action" id="navNewPlan">➕ خطة جديدة</button>
-    </div>
-    <div class="nav-group">
-      <button class="pill active-pill" data-page="home">🏠 الرئيسية</button>
-      <button class="pill" data-page="stats">📊 الإحصائيات</button>
-      <button class="pill" data-page="calendar">📅 التقويم</button>
-      <button class="pill" data-page="achievements">🏆 الإنجازات</button>
-      <button class="pill" data-page="settings">⚙️ الإعدادات</button>
-    </div>
+    <div class="nav-group" id="planPills"></div>
+    <button class="pill" id="navQuran">📋 متابعة حفظ القرآن</button>
+    <button class="pill action" id="navNewPlan">➕ خطة جديدة</button>
+    <button class="pill active-pill" data-page="home">🏠 الرئيسية</button>
+    <button class="pill" data-page="stats">📊 الإحصائيات</button>
+    <button class="pill" data-page="calendar">📅 التقويم</button>
+    <button class="pill" data-page="achievements">🏆 الإنجازات</button>
+    <button class="pill" data-page="settings">⚙️ الإعدادات</button>
   </div>
 </nav>
 
@@ -338,10 +330,11 @@
         <div class="chart-block">
           <h3>📊 الإنجاز الأسبوعي</h3>
           <div class="chart-wrap"><canvas id="weekChart"></canvas></div>
+          <p class="chart-caption" id="bestWeekCaption"></p>
         </div>
         <div class="chart-block">
           <h3>🥧 توزيع مستوى الإنجاز</h3>
-          <div id="planDonutWrap" class="chart-wrap small"><canvas id="donutChartPlan"></canvas></div>
+          <div id="planDonutWrap" class="chart-wrap"><canvas id="donutChartPlan"></canvas></div>
           <div class="chart-empty" id="planDonutEmpty" style="display:none;">لا توجد بيانات كافية بعد</div>
         </div>
       </div>
@@ -1037,13 +1030,19 @@ function buildPlanTable(plan){
   }));
 }
 function burstConfetti(el){
-  const colors = ['#b7ecd4','#a9d8ec','#c9bdf0','#ffd88a','#f7a8c4'];
+  const colors = ['#e0685a','#a9d8ec','#4fae8c','#f5c95d','#b39ddb'];
+  const shapes = ['square','circle','diamond'];
   for(let i=0;i<32;i++){
     const p = document.createElement('div'); p.className='confetti-piece';
     const fromRight = i % 2 === 0;
     p.classList.add(fromRight ? 'from-right' : 'from-left');
-    p.style.width = (5+Math.random()*4)+'px'; p.style.height = p.style.width;
+    const shape = shapes[i % shapes.length];
+    const size = 6+Math.random()*5;
+    p.style.width = size+'px'; p.style.height = size+'px';
     p.style.background = colors[i%colors.length];
+    if(shape === 'circle'){ p.style.borderRadius = '50%'; }
+    else if(shape === 'diamond'){ p.style.borderRadius='2px'; p.style.setProperty('--baseRot','45deg'); }
+    else { p.style.borderRadius='2px'; }
     const travel = window.innerWidth*0.45 + Math.random()*window.innerWidth*0.25;
     p.style.setProperty('--dx', (fromRight ? -travel : travel)+'px');
     p.style.setProperty('--dy', (Math.random()*window.innerHeight*0.6 + 60)+'px');
@@ -1154,10 +1153,13 @@ function refreshStats(){
       for(let i=0;i<rows.length;i+=7){ weeks.push(rows.slice(i,i+7)); }
       const weekLabels = weeks.map((w,i)=>'أسبوع '+(i+1));
       const weekData = weeks.map(w=> w.length ? Math.round(w.filter(r=>r.done).length/w.length*100) : 0);
+      const weekDoneCounts = weeks.map(w=> w.filter(r=>r.done).length);
       if(chartWeek) chartWeek.destroy();
       chartWeek = new Chart(document.getElementById('weekChart').getContext('2d'), {
         type:'bar',
-        data:{ labels: weekLabels, datasets:[{ label:'الإنجاز الأسبوعي', data:weekData, backgroundColor:'#a9d8ec', hoverBackgroundColor:'#8fc7e0', borderRadius:8, maxBarThickness:42 }] },
+        data:{ labels: weekLabels, datasets:[{ label:'الإنجاز الأسبوعي', data:weekData,
+          backgroundColor: weekData.map(v => v>=70?'#4fae8c': v>0?'#a9d8ec':'#e7e3f5'),
+          hoverBackgroundColor:'#8fc7e0', borderRadius:8, maxBarThickness:42 }] },
         options:{
           responsive:true, maintainAspectRatio:false,
           plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>'الإنجاز: '+ctx.parsed.y+'%' } } },
@@ -1167,6 +1169,10 @@ function refreshStats(){
           }
         }
       });
+      let bestWeekIdx = 0;
+      weekDoneCounts.forEach((c,i)=>{ if(c > weekDoneCounts[bestWeekIdx]) bestWeekIdx = i; });
+      const bw = document.getElementById('bestWeekCaption');
+      bw.textContent = weekDoneCounts[bestWeekIdx] > 0 ? `أفضل أسبوع: أسبوع ${bestWeekIdx+1} (${weekDoneCounts[bestWeekIdx]} أيام)` : '';
     }
     const empty = st.doneDays===0;
     document.getElementById('planDonutEmpty').style.display = empty?'block':'none';
@@ -1176,13 +1182,13 @@ function refreshStats(){
       rows.forEach(r=>counts[r.hifz]++);
       if(chartDonutPlan) chartDonutPlan.destroy();
       chartDonutPlan = new Chart(document.getElementById('donutChartPlan').getContext('2d'), {
-        type:'doughnut',
-        data:{labels:levelsHifz, datasets:[{data:counts, backgroundColor:['#e7e3f5','#cbb8f0','#a9d8ec','#8fd9b6','#6ac9a0','#4fae8c'], borderColor:'#fff', borderWidth:2}]},
+        type:'pie',
+        data:{labels:levelsHifz.map((l,i)=>`${l} (${counts[i]})`), datasets:[{data:counts, backgroundColor:['#e7e3f5','#cbb8f0','#a9d8ec','#e0a3ad','#d8b978','#8fc7d8'], borderColor:'#fff', borderWidth:2}]},
         options:{
-          responsive:true, maintainAspectRatio:false, cutout:'62%',
+          responsive:true, maintainAspectRatio:false,
           plugins:{
-            legend:{ position:'bottom', labels:{font:{size:10.5}, boxWidth:12, padding:10, usePointStyle:true} },
-            tooltip:{ callbacks:{ label: ctx => `${ctx.label}: ${ctx.parsed} يوم` } }
+            legend:{ position:'left', labels:{font:{size:11}, boxWidth:12, padding:10, usePointStyle:true} },
+            tooltip:{ callbacks:{ label: ctx => `${ctx.label}` } }
           }
         }
       });
