@@ -6,7 +6,7 @@
 <title>في رحاب حفظ القرآن الكريم</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Cairo:wght@300;400;600;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root{
     --font-main: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif;
@@ -43,7 +43,7 @@
   .nav-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
   .brand{ font-weight:800; font-size:15px; display:flex; align-items:center; gap:8px; white-space:nowrap; cursor:pointer; border:none; background:none; color:var(--ink); font-family:var(--font-main); padding:0; }
   .brand .ic{ font-size:18px; }
-  .pill{ border:1.5px solid var(--line); background:#fff; color:var(--ink-soft); font-family:var(--font-main); font-size:13px; font-weight:700; padding:9px 16px; border-radius:14px; cursor:pointer; white-space:nowrap; transition:all .18s ease; }
+  .pill{ border:1.5px solid var(--line); background:#fff; color:var(--ink-soft); font-family:var(--font-main); font-size:13px; font-weight:700; padding:9px 16px; min-height:38px; box-sizing:border-box; border-radius:14px; cursor:pointer; white-space:nowrap; transition:all .18s ease; }
   .pill:hover{ border-color:#c9bdf0; }
   .pill.active-pill{ background: var(--grad); border-color:transparent; color:#1c3b33; box-shadow: 0 8px 18px -8px rgba(120,200,180,.55); }
   .pill.action{ background:#f4f2fb; border-style:dashed; }
@@ -79,7 +79,7 @@
   .hint{ font-size:11.5px; color:#9691b0; margin-bottom:8px; }
 
   .segmented{ display:flex; gap:9px; }
-  .seg-btn{ flex:1; padding:11px 9px; text-align:center; border-radius:13px; border:1.5px solid var(--line); background:#faf9ff; font-family:var(--font-main); font-size:13px; font-weight:600; color:var(--ink-soft); cursor:pointer; transition: all .18s ease; }
+  .seg-btn{ flex:1; padding:11px 9px; min-height:40px; box-sizing:border-box; text-align:center; border-radius:13px; border:1.5px solid var(--line); background:#faf9ff; font-family:var(--font-main); font-size:13px; font-weight:600; color:var(--ink-soft); cursor:pointer; transition: all .18s ease; }
   .seg-btn.active{ background: var(--grad); border-color: transparent; color:#1c3b33; }
   .path-target{ margin-top:12px; }
 
@@ -95,27 +95,51 @@
   .edit-plan-btn:hover{ border-color:#c9bdf0; }
   .plan-summary{ display:flex; flex-wrap:wrap; gap:10px; background:#faf9ff; border:1px solid var(--line); border-radius:14px; padding:12px 16px; font-size:12.5px; margin-bottom:16px; }
   .summary-chip{ display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--line); border-radius:10px; padding:6px 12px; }
-  .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:16px; width:100%; }
-  table{ border-collapse:collapse; width:100%; min-width:680px; font-size:12.5px; table-layout:fixed; }
-  thead th{ background:#f4f2fb; padding:11px 9px; font-weight:800; border-bottom:1.5px solid var(--line); position:sticky; top:0; vertical-align:middle; line-height:1.4; }
-  tbody td{ padding:8px; border-bottom:1px solid var(--line); text-align:center; vertical-align:middle; line-height:1.4; height:52px; }
-  tbody td select, tbody td input{ height:38px; }
-  tbody td .ach-cell{ height:38px; }
+  .filter-chip{ cursor:pointer; transition:all .15s ease; }
+  .filter-chip:hover{ border-color:#a9d8ec; }
+  .filter-chip.active{ background:var(--grad); border-color:transparent; font-weight:800; color:#1c3b33; }
+  .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:16px; width:100%; -webkit-overflow-scrolling:touch; }
+
+  .gtable{ width:100%; border:1px solid var(--line); border-radius:16px; overflow:hidden; background:#fff; }
+  .gtable-head, .gtable-row{ display:grid; align-items:stretch; }
+  #quranGtableHead, #quranGtable .gtable-row{ grid-template-columns: 90px 1.2fr 1.2fr 1.2fr 1.3fr 80px; }
+  #planGtableHead, #planGtable .gtable-row{ grid-template-columns: 36px 92px 66px 1.6fr 1.2fr 1.2fr 90px; }
+  .gtable-head{ background:#f0edfa; font-weight:800; font-size:12px; border-bottom:2px solid #ddd6f3; }
+  .gtable-head > div{ padding:12px 6px; text-align:center; display:flex; align-items:center; justify-content:center; border-left:1px solid #e3ddf5; }
+  .gtable-head > div:last-child{ border-left:none; }
+  .gtable-row{ font-size:12.5px; border-bottom:1px solid var(--line); }
+  .gtable-row:nth-child(even){ background:#faf9ff; }
+  .gtable-row:last-child{ border-bottom:none; }
+  .gtable-row:hover{ background:#f1ecfc; }
+  .gtable-row > div{ padding:8px 6px; display:flex; align-items:center; justify-content:center; text-align:center; min-height:52px; box-sizing:border-box; overflow:hidden; border-left:1px solid #ece8f7; }
+  .gtable-row > div:last-child{ border-left:none; }
+  .gtable-row select, .gtable-row input[type="text"]{ height:38px; box-sizing:border-box; width:100%; }
+  .gcell-actions{ gap:6px; }
+
+  @media (max-width:680px){
+    .gtable-head{ display:none; }
+    #quranGtable .gtable-row, #planGtable .gtable-row{ grid-template-columns: 1fr; }
+    .gtable-row{ padding:10px 12px; display:flex; flex-direction:column; gap:8px; }
+    .gtable-row > div{ justify-content:space-between; text-align:right; padding:0; min-height:auto; width:100%; border-left:none; border-bottom:1px dashed #ece8f7; padding-bottom:6px; }
+    .gtable-row > div:last-child{ border-bottom:none; padding-bottom:0; }
+    .gtable-row > div::before{ content:attr(data-label); font-weight:700; color:var(--ink-soft); font-size:11.5px; flex-shrink:0; margin-left:10px; }
+    .gtable-row select, .gtable-row input[type="text"]{ max-width:60%; }
+  }
   .motivate-box{ background: var(--grad-soft); border:1px solid #dfeff0; border-radius:16px; padding:14px 18px; text-align:center; font-size:13.5px; font-weight:700; margin-bottom:18px; }
   .tracking-toolbar{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
   .progress-pill{ background:#faf9ff; border:1.5px solid var(--line); border-radius:13px; padding:9px 16px; font-size:13px; }
   .progress-pill b{ color:#2f8f6e; font-size:14.5px; }
   tbody tr:hover{ background:#faf9ff; }
   .unit-cell{ font-weight:700; white-space:nowrap; }
-  .note-input{ min-width:100px; padding:7px; font-size:12px; }
+  .note-input{ padding:7px; font-size:12px; }
   .ach-cell{ display:flex; align-items:center; justify-content:center; gap:6px; }
   .done-check{ width:18px; height:18px; accent-color:#4fae8c; cursor:pointer; }
-  .icon-btn{ border:none; background:#faf9ff; border-radius:8px; padding:6px 8px; font-size:14px; cursor:pointer; }
+  .gtable-row select{ font-size:11.5px; padding:7px 22px 7px 6px; }
+  .icon-btn{ height:34px; display:inline-flex; align-items:center; justify-content:center; border:none; background:#faf9ff; border-radius:8px; padding:6px 8px; font-size:14px; cursor:pointer; flex-shrink:0; }
   .icon-btn:hover{ background:#efeaff; }
-  td select{ font-size:11.5px; padding:7px 24px 7px 6px; min-width:120px; }
 
-  .confetti-piece{ position:fixed; width:6px;height:6px;border-radius:2px; pointer-events:none; z-index:999; animation:confettiFall 1s ease-out forwards;}
-  @keyframes confettiFall{ from{ transform:translate(0,0) rotate(0); opacity:1;} to{ transform:translate(var(--dx),90px) rotate(220deg); opacity:0;} }
+  .confetti-piece{ position:fixed; width:6px;height:6px;border-radius:2px; pointer-events:none; z-index:999; top:-12px; animation:confettiFall 1.3s ease-in forwards;}
+  @keyframes confettiFall{ from{ transform:translateY(0) rotate(0); opacity:1;} to{ transform:translateY(var(--dy)) translateX(var(--dx)) rotate(260deg); opacity:0;} }
 
   .stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
   .stat-tile{ background:#faf9ff; border:1px solid var(--line); border-radius:15px; padding:16px 12px; text-align:center; }
@@ -180,7 +204,16 @@
 
   @keyframes rise{ from{ opacity:0; transform: translateY(16px);} to{ opacity:1; transform: translateY(0);} }
   @media (max-width:720px){ .row2, .stat-grid, .ach-grid{ grid-template-columns:1fr 1fr; } .card, .hero{ padding:24px 18px; border-radius:20px; } }
-  @media (max-width:480px){ .stat-grid{ grid-template-columns:1fr 1fr; } .ach-grid{ grid-template-columns:1fr; } }
+  @media (max-width:480px){
+    .stat-grid{ grid-template-columns:1fr 1fr; } .ach-grid{ grid-template-columns:1fr; }
+    .wrap{ padding:20px 12px 0; }
+    .card, .hero{ padding:20px 14px; }
+    .nav-row{ gap:6px; } .pill{ font-size:12px; padding:8px 12px; }
+    .row2{ grid-template-columns:1fr; }
+    .hero h1{ font-size:21px; } .card h2{ font-size:19px; }
+    .donut-row{ flex-direction:column; }
+  }
+  @media (max-width:360px){ .pill{ font-size:11px; padding:7px 10px; } .hero-icon{ width:52px; height:52px; font-size:24px; } }
   @media (prefers-reduced-motion: reduce){ .hero, .card, .page.active{ animation:none; } }
 </style>
 </head>
@@ -237,26 +270,22 @@
           </div>
           <div class="progress-pill">نسبة الإنجاز: <b id="progressPct">0%</b></div>
         </div>
-        <div class="table-wrap">
-          <table id="trackingTable">
-            <thead><tr>
-              <th id="unitColHeader">الصفحة</th><th>مستوى الحفظ</th><th>مستوى الثبيت</th><th>مستوى التجويد</th><th>ملاحظات</th><th>الإنجاز</th>
-            </tr></thead>
-            <tbody id="trackingBody"></tbody>
-          </table>
+        <div class="gtable" id="quranGtable">
+          <div class="gtable-head" id="quranGtableHead">
+            <div id="unitColHeader">الصفحة</div><div>مستوى الحفظ</div><div>مستوى الثبيت</div><div>مستوى التجويد</div><div>ملاحظات</div><div>الإنجاز</div>
+          </div>
+          <div id="trackingBody"></div>
         </div>
       </div>
 
       <!-- plan day schedule -->
       <div id="planTableArea" style="display:none;">
         <div class="plan-summary" id="planTableSummary"></div>
-        <div class="table-wrap">
-          <table id="planTable">
-            <thead><tr>
-              <th>#</th><th>التاريخ</th><th>اليوم</th><th>الهدف اليومي</th><th>مستوى الحفظ</th><th>ملاحظات</th><th>الإنجاز</th>
-            </tr></thead>
-            <tbody id="planTableBody"></tbody>
-          </table>
+        <div class="gtable" id="planGtable">
+          <div class="gtable-head" id="planGtableHead">
+            <div>#</div><div>التاريخ</div><div>اليوم</div><div>الهدف اليومي</div><div>مستوى الحفظ</div><div>ملاحظات</div><div>الإنجاز</div>
+          </div>
+          <div id="planTableBody"></div>
         </div>
       </div>
     </section>
@@ -472,6 +501,46 @@ const surahs = ["الفاتحة","البقرة","آل عمران","النساء"
 "القارعة","التكاثر","العصر","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر",
 "المسد","الإخلاص","الفلق","الناس"];
 
+const surahPageRanges = [[1,1],[2,49],[50,76],[77,106],[107,127],[128,150],[151,176],[177,186],[187,207],[208,221],
+[222,235],[235,248],[249,255],[255,261],[262,267],[267,281],[282,293],[293,304],[305,312],[312,321],
+[322,332],[332,341],[342,349],[350,359],[359,366],[367,376],[377,385],[385,396],[396,404],[404,410],
+[411,414],[415,417],[418,427],[428,434],[435,440],[440,445],[446,452],[453,458],[458,467],[467,476],
+[477,482],[483,489],[489,495],[496,498],[499,502],[502,506],[507,510],[511,515],[516,517],[518,520],
+[520,523],[523,525],[526,528],[528,531],[531,534],[534,537],[537,541],[542,545],[546,548],[549,551],
+[551,552],[553,553],[554,554],[556,557],[558,559],[560,561],[562,564],[564,566],[566,568],[568,570],
+[570,571],[572,573],[574,575],[575,577],[577,578],[578,580],[580,581],[582,582],[583,584],[585,585],
+[586,586],[587,587],[587,589],[589,590],[590,590],[591,591],[591,592],[592,592],[593,594],[594,595],
+[595,595],[595,596],[596,596],[596,596],[597,597],[597,598],[598,598],[598,599],[599,599],[599,600],
+[600,600],[600,600],[601,601],[601,601],[601,601],[602,602],[602,602],[602,602],[603,603],[603,603],
+[603,603],[604,604],[604,604],[604,604]];
+const surahIndexesForPage = Array.from({length:604}, ()=>[]);
+surahPageRanges.forEach((rg,idx)=>{ for(let p=rg[0]; p<=rg[1]; p++){ surahIndexesForPage[p-1].push(idx); } });
+function syncSurahToPages(surahIdx, checked){
+  const pageStore = getStore('quran','page'), surahStore = getStore('quran','surah');
+  const [s,e] = surahPageRanges[surahIdx];
+  for(let p=s; p<=e; p++){
+    if(checked){
+      const owners = surahIndexesForPage[p-1];
+      if(owners.every(oi => surahStore[oi].done)) pageStore[p-1].done = true;
+    } else {
+      pageStore[p-1].done = false;
+    }
+  }
+}
+function syncPageToSurahs(pageIdx, checked){
+  const pageStore = getStore('quran','page'), surahStore = getStore('quran','surah');
+  const owners = surahIndexesForPage[pageIdx];
+  owners.forEach(si=>{
+    const [s,e] = surahPageRanges[si];
+    if(checked){
+      let all = true; for(let p=s;p<=e;p++){ if(!pageStore[p-1].done){ all=false; break; } }
+      if(all) surahStore[si].done = true;
+    } else {
+      surahStore[si].done = false;
+    }
+  });
+}
+
 const juzRanges = [[1,21],[22,41],[42,61],[62,81],[82,101],[102,121],[122,141],[142,161],[162,181],[182,201],
 [202,221],[222,241],[242,261],[262,281],[282,301],[302,321],[322,341],[342,361],[362,381],[382,401],
 [402,421],[422,441],[442,461],[462,481],[482,501],[502,521],[522,541],[542,561],[562,581],[582,604]];
@@ -560,6 +629,7 @@ let chartLine=null, chartDonutPlan=null, chartDonutHifz=null, chartDonutTajweed=
 
 function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function getPlan(ctx){ const id = ctx.replace('plan:',''); return plans.find(p=>p.id===id); }
+if(window.Chart){ Chart.defaults.font.family = "'IBM Plex Sans Arabic','Tajawal',sans-serif"; Chart.defaults.font.size = 12; }
 
 /* ================= NAV / PAGES ================= */
 function showPage(pageId){
@@ -573,10 +643,11 @@ function showPage(pageId){
   if(pageId === 'achievements'){ refreshAchievements(); }
   if(pageId === 'settings' && !creatingNewPlan){ loadSettingsForContext(); }
 }
-document.querySelectorAll('.pill[data-page]').forEach(b=> b.addEventListener('click', ()=> showPage(b.dataset.page)));
-document.getElementById('brandHome').addEventListener('click', ()=>{ homeMode = activeContext ? homeMode : 'hero'; showPage('home'); });
+document.querySelectorAll('.pill[data-page]').forEach(b=> b.addEventListener('click', ()=>{ creatingNewPlan = false; showPage(b.dataset.page); }));
+document.getElementById('brandHome').addEventListener('click', ()=>{ creatingNewPlan = false; homeMode = activeContext ? homeMode : 'hero'; showPage('home'); });
 
 function setContext(ctx){
+  creatingNewPlan = false;
   activeContext = ctx; homeMode = 'tracking';
   document.querySelectorAll('.context-pill').forEach(b=> b.classList.toggle('active-pill', b.dataset.context === ctx));
   showPage('home');
@@ -763,21 +834,28 @@ function buildLevelSelect(arr, col, idx, selectedIndex){
 }
 function buildQuranTable(){
   const store = getStore('quran', trackMode);
-  document.getElementById('unitColHeader').textContent = trackMode==='page' ? 'الصفحة' : 'السورة';
+  const unitLabel = trackMode==='page' ? 'الصفحة' : 'السورة';
+  document.getElementById('unitColHeader').textContent = unitLabel;
   let rowsHTML = [];
   for(let i=0;i<store.length;i++){
     const r = store[i]; const label = trackMode==='page' ? (i+1) : surahs[i];
-    rowsHTML.push(`<tr>
-      <td class="unit-cell">${label}</td>
-      <td>${buildLevelSelect(levelsHifz,'hifz',i,r.hifz)}</td>
-      <td>${buildLevelSelect(levelsThabit,'thabit',i,r.thabit)}</td>
-      <td>${buildLevelSelect(levelsTajweed,'tajweed',i,r.tajweed)}</td>
-      <td><input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="ملاحظة..."></td>
-      <td class="ach-cell"><input type="checkbox" class="done-check" data-idx="${i}" ${r.done?'checked':''}></td>
-    </tr>`);
+    rowsHTML.push(`<div class="gtable-row">
+      <div class="unit-cell" data-label="${unitLabel}">${label}</div>
+      <div data-label="مستوى الحفظ">${buildLevelSelect(levelsHifz,'hifz',i,r.hifz)}</div>
+      <div data-label="مستوى الثبيت">${buildLevelSelect(levelsThabit,'thabit',i,r.thabit)}</div>
+      <div data-label="مستوى التجويد">${buildLevelSelect(levelsTajweed,'tajweed',i,r.tajweed)}</div>
+      <div data-label="ملاحظات"><input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="ملاحظة..."></div>
+      <div class="ach-cell" data-label="الإنجاز"><input type="checkbox" class="done-check" data-idx="${i}" ${r.done?'checked':''}></div>
+    </div>`);
   }
   document.getElementById('trackingBody').innerHTML = rowsHTML.join('');
-  document.querySelectorAll('#trackingBody .done-check').forEach(cb=> cb.addEventListener('change', ()=>{ store[cb.dataset.idx].done = cb.checked; updateQuranProgress(); if(cb.checked) burstConfetti(cb); }));
+  document.querySelectorAll('#trackingBody .done-check').forEach(cb=> cb.addEventListener('change', ()=>{
+    store[cb.dataset.idx].done = cb.checked;
+    updateQuranProgress();
+    if(cb.checked) burstConfetti(cb);
+    if(trackMode === 'surah') syncSurahToPages(parseInt(cb.dataset.idx), cb.checked);
+    if(trackMode === 'page') syncPageToSurahs(parseInt(cb.dataset.idx), cb.checked);
+  }));
   document.querySelectorAll('#trackingBody select').forEach(sel=> sel.addEventListener('change', ()=>{ store[sel.dataset.idx][sel.dataset.col] = sel.selectedIndex; }));
   document.querySelectorAll('#trackingBody .note-input').forEach(inp=> inp.addEventListener('input', ()=>{ store[inp.dataset.idx].note = inp.value; }));
   updateQuranProgress();
@@ -811,26 +889,28 @@ function buildPlanSchedule(plan){
     const d = new Date(start.getTime()+i*86400000);
     let targetLabel = 'الخطة مكتملة 🎉';
     if(plan.targetMode === 'جزء'){
-      const slice = sequence.slice(cursor, cursor+pagesPerDay); cursor += pagesPerDay;
-      if(slice.length){
-        const pageLabel = slice.length===1 ? `صفحة ${slice[0]}` : `صفحة ${slice[0]}-${slice[slice.length-1]}`;
-        if(plan.unit === 'حزب'){
-          const h1 = pageToHizb(slice[0]), h2 = pageToHizb(slice[slice.length-1]);
-          targetLabel = `الحزب ${h1}${h1!==h2?'-'+h2:''} (${pageLabel})`;
-        } else if(plan.unit === 'وجه'){
-          targetLabel = `${plan.qty} وجه (${pageLabel})`;
-        } else {
-          targetLabel = pageLabel;
-        }
+      const startIdx = cursor % sequence.length;
+      const segs = []; let remaining = pagesPerDay, idx = startIdx;
+      while(remaining>0){ const take = Math.min(remaining, sequence.length-idx); segs.push(sequence.slice(idx, idx+take)); remaining -= take; idx = 0; }
+      cursor += pagesPerDay;
+      const first = segs[0][0], last = segs[segs.length-1][segs[segs.length-1].length-1];
+      const pageLabel = segs.map(seg => seg.length===1 ? `صفحة ${seg[0]}` : `صفحة ${seg[0]}-${seg[seg.length-1]}`).join(' + ');
+      if(plan.unit === 'حزب'){
+        const h1 = pageToHizb(first), h2 = pageToHizb(last);
+        targetLabel = `الحزب ${h1}${h1!==h2?'-'+h2:''} (${pageLabel})`;
+      } else if(plan.unit === 'وجه'){
+        targetLabel = `${plan.qty} وجه (${pageLabel})`;
+      } else {
+        targetLabel = pageLabel;
       }
     } else {
       const startIdx = surahs.indexOf(plan.rawTarget);
       const perDay = Math.max(1, Math.round(parseFloat(plan.qty)));
       const dir = plan.direction === 'تصاعدي' ? 1 : -1;
       const idxs = [];
-      for(let k=0;k<perDay;k++){ const idx = startIdx + dir*(cursor+k); if(idx>=0 && idx<114) idxs.push(idx); }
+      for(let k=0;k<perDay;k++){ let idx = (startIdx + dir*(cursor+k)) % 114; if(idx<0) idx += 114; idxs.push(idx); }
       cursor += perDay;
-      if(idxs.length) targetLabel = idxs.map(ix=>surahs[ix]).join('، ');
+      targetLabel = idxs.map(ix=>surahs[ix]).join('، ');
     }
     const prev = prevRows[i];
     rows.push({ date: fmtDateInput(new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))), dayName: dayNamesAr[d.getDay()], target: targetLabel,
@@ -844,25 +924,33 @@ function planTypeIcon(followType){
   if(followType==='ضبط التجويد') return '⚙️';
   return '📁';
 }
+let planTableFilter = 'all';
 function buildPlanTable(plan){
   if(!planSchedules[plan.id]) buildPlanSchedule(plan);
   const rows = planSchedules[plan.id];
   const total = rows.length, completed = rows.filter(r=>r.done).length;
   document.getElementById('planTableSummary').innerHTML =
-    `<span class="summary-chip">📊 الكل: ${total}</span>
-     <span class="summary-chip">⏳ المتبقي: ${total-completed}</span>
-     <span class="summary-chip">✅ المكتمل: ${completed}</span>
+    `<span class="summary-chip filter-chip ${planTableFilter==='all'?'active':''}" data-filter="all">📊 الكل: ${total}</span>
+     <span class="summary-chip filter-chip ${planTableFilter==='remaining'?'active':''}" data-filter="remaining">⏳ المتبقي: ${total-completed}</span>
+     <span class="summary-chip filter-chip ${planTableFilter==='done'?'active':''}" data-filter="done">✅ المكتمل: ${completed}</span>
      <span class="summary-chip">📅 الأيام: ${completed}/${total}</span>
      <span class="summary-chip">${planTypeIcon(plan.followType)} نوع الخطة: ${escapeHtml(plan.followType)}</span>`;
-  document.getElementById('planTableBody').innerHTML = rows.map((r,i)=>`<tr>
-    <td>${i+1}</td><td>${r.date}</td><td>${r.dayName}</td><td>${escapeHtml(r.target)}</td>
-    <td>${buildLevelSelect(levelsHifz,'hifz',i,r.hifz)}</td>
-    <td><input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="ملاحظة..."></td>
-    <td class="ach-cell">
+  document.querySelectorAll('.filter-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{ planTableFilter = chip.dataset.filter; buildPlanTable(plan); });
+  });
+  const visibleRows = rows.map((r,i)=>({r,i})).filter(({r})=> planTableFilter==='all' || (planTableFilter==='done'&&r.done) || (planTableFilter==='remaining'&&!r.done));
+  document.getElementById('planTableBody').innerHTML = visibleRows.map(({r,i})=>`<div class="gtable-row">
+    <div data-label="#">${i+1}</div>
+    <div data-label="التاريخ">${r.date}</div>
+    <div data-label="اليوم">${r.dayName}</div>
+    <div data-label="الهدف اليومي">${escapeHtml(r.target)}</div>
+    <div data-label="مستوى الحفظ">${buildLevelSelect(levelsHifz,'hifz',i,r.hifz)}</div>
+    <div data-label="ملاحظات"><input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="ملاحظة..."></div>
+    <div class="ach-cell gcell-actions" data-label="الإنجاز">
       <button class="icon-btn done-btn" data-idx="${i}" title="${r.done?'تراجع':'إنجاز'}">${r.done?'↩️':'✔️'}</button>
       <button class="icon-btn trash-btn" data-idx="${i}" title="إعادة تعيين">🗑️</button>
-    </td>
-  </tr>`).join('');
+    </div>
+  </div>`).join('');
   document.querySelectorAll('#planTableBody select').forEach(sel=> sel.addEventListener('change', ()=>{ rows[sel.dataset.idx][sel.dataset.col] = sel.selectedIndex; }));
   document.querySelectorAll('#planTableBody .note-input').forEach(inp=> inp.addEventListener('input', ()=>{ rows[inp.dataset.idx].note = inp.value; }));
   document.querySelectorAll('#planTableBody .done-btn').forEach(btn=> btn.addEventListener('click', ()=>{
@@ -877,13 +965,18 @@ function buildPlanTable(plan){
 }
 function burstConfetti(el){
   const rect = el.getBoundingClientRect();
+  const originX = rect.left + rect.width/2;
   const colors = ['#b7ecd4','#a9d8ec','#c9bdf0','#ffd88a','#f7a8c4'];
-  for(let i=0;i<20;i++){
+  for(let i=0;i<28;i++){
     const p = document.createElement('div'); p.className='confetti-piece';
-    p.style.left = (rect.left + rect.width/2) + 'px'; p.style.top = rect.top + 'px';
+    const spread = (Math.random()*260-130);
+    p.style.left = Math.min(window.innerWidth-10, Math.max(10, originX + spread)) + 'px';
     p.style.width = (5+Math.random()*4)+'px'; p.style.height = p.style.width;
-    p.style.background = colors[i%colors.length]; p.style.setProperty('--dx', (Math.random()*160-80)+'px');
-    document.body.appendChild(p); setTimeout(()=>p.remove(), 1000);
+    p.style.background = colors[i%colors.length];
+    p.style.setProperty('--dx', (Math.random()*60-30)+'px');
+    p.style.setProperty('--dy', (window.innerHeight*0.5 + Math.random()*window.innerHeight*0.4)+'px');
+    p.style.animationDelay = (Math.random()*0.25)+'s';
+    document.body.appendChild(p); setTimeout(()=>p.remove(), 1600);
   }
 }
 
@@ -1034,7 +1127,11 @@ renderLevelChips('chipsThabit', levelsThabit);
 renderLevelChips('chipsTajweed', levelsTajweed);
 
 document.querySelectorAll('#fontChips .chip').forEach(chip=>{
-  chip.addEventListener('click', ()=>{ document.querySelectorAll('#fontChips .chip').forEach(c=>c.classList.remove('active')); chip.classList.add('active'); document.documentElement.style.setProperty('--font-main', chip.dataset.font); });
+  chip.addEventListener('click', ()=>{
+    document.querySelectorAll('#fontChips .chip').forEach(c=>c.classList.remove('active')); chip.classList.add('active');
+    document.documentElement.style.setProperty('--font-main', chip.dataset.font);
+    if(window.Chart){ Chart.defaults.font.family = chip.dataset.font; if(document.getElementById('page-stats').classList.contains('active')) refreshStats(); }
+  });
 });
 document.getElementById('darkModeToggle').addEventListener('change', function(){
   if(this.checked){ document.body.style.background = '#1c1a2b'; document.body.style.color = '#f0eefa'; }
