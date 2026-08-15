@@ -41,6 +41,12 @@
   .nav-row.row1{ padding-bottom:10px; }
   .nav-row.row2{ justify-content:space-between; gap:14px; }
   .nav-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  @media (max-width:760px){
+    .topnav{ padding:10px 12px; }
+    .nav-row.row2{ flex-direction:column; align-items:stretch; gap:8px; }
+    .nav-row.row2 .nav-group{ justify-content:flex-start; }
+    .brand{ font-size:13.5px; }
+  }
   .brand{ font-weight:800; font-size:15px; display:flex; align-items:center; gap:8px; white-space:nowrap; cursor:pointer; border:none; background:none; color:var(--ink); font-family:var(--font-main); padding:0; }
   .brand .ic{ font-size:18px; }
   .pill{ border:1.5px solid var(--line); background:#fff; color:var(--ink-soft); font-family:var(--font-main); font-size:13px; font-weight:700; padding:9px 16px; min-height:38px; box-sizing:border-box; border-radius:14px; cursor:pointer; white-space:nowrap; transition:all .18s ease; }
@@ -115,6 +121,7 @@
   .gtable-row > div:last-child{ border-left:none; }
   .gtable-row select, .gtable-row input[type="text"]{ height:38px; box-sizing:border-box; width:100%; }
   .gcell-actions{ gap:6px; }
+  .gtable-row.rest-row{ background:#f7f6fb; color:#9691b0; font-style:italic; }
 
   @media (max-width:680px){
     .gtable-head{ display:none; }
@@ -138,8 +145,10 @@
   .icon-btn{ height:34px; display:inline-flex; align-items:center; justify-content:center; border:none; background:#faf9ff; border-radius:8px; padding:6px 8px; font-size:14px; cursor:pointer; flex-shrink:0; }
   .icon-btn:hover{ background:#efeaff; }
 
-  .confetti-piece{ position:fixed; width:6px;height:6px;border-radius:2px; pointer-events:none; z-index:999; top:-12px; animation:confettiFall 1.3s ease-in forwards;}
-  @keyframes confettiFall{ from{ transform:translateY(0) rotate(0); opacity:1;} to{ transform:translateY(var(--dy)) translateX(var(--dx)) rotate(260deg); opacity:0;} }
+  .confetti-piece{ position:fixed; top:-12px; width:6px;height:6px;border-radius:2px; pointer-events:none; z-index:999; animation:confettiSweep 1.3s ease-in forwards;}
+  .confetti-piece.from-right{ right:-12px; }
+  .confetti-piece.from-left{ left:-12px; }
+  @keyframes confettiSweep{ from{ transform:translateX(0) translateY(0) rotate(0); opacity:1;} to{ transform:translateX(var(--dx)) translateY(var(--dy)) rotate(260deg); opacity:0;} }
 
   .stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
   .stat-tile{ background:#faf9ff; border:1px solid var(--line); border-radius:15px; padding:16px 12px; text-align:center; }
@@ -206,14 +215,24 @@
   @media (max-width:720px){ .row2, .stat-grid, .ach-grid{ grid-template-columns:1fr 1fr; } .card, .hero{ padding:24px 18px; border-radius:20px; } }
   @media (max-width:480px){
     .stat-grid{ grid-template-columns:1fr 1fr; } .ach-grid{ grid-template-columns:1fr; }
-    .wrap{ padding:20px 12px 0; }
-    .card, .hero{ padding:20px 14px; }
-    .nav-row{ gap:6px; } .pill{ font-size:12px; padding:8px 12px; }
+    .wrap{ padding:16px 10px 0; gap:18px; }
+    .card, .hero{ padding:18px 12px; border-radius:16px; }
+    .nav-row{ gap:6px; } .pill{ font-size:11.5px; padding:8px 11px; min-height:36px; }
     .row2{ grid-template-columns:1fr; }
-    .hero h1{ font-size:21px; } .card h2{ font-size:19px; }
+    .hero h1{ font-size:20px; } .card h2{ font-size:18px; }
     .donut-row{ flex-direction:column; }
+    .chart-block{ padding:14px 10px; }
+    .stat-tile{ padding:12px 8px; }
+    .stat-tile .val{ font-size:15px; }
+    .cal-grid{ gap:4px; }
+    .cal-cell .g{ font-size:12px; } .cal-cell .h{ font-size:9px; }
+    .plan-summary{ gap:6px; }
+    .summary-chip{ padding:5px 9px; font-size:11px; }
   }
   @media (max-width:360px){ .pill{ font-size:11px; padding:7px 10px; } .hero-icon{ width:52px; height:52px; font-size:24px; } }
+  .chart-wrap{ position:relative; width:100%; height:260px; }
+  .chart-wrap.small{ height:210px; }
+  @media (max-width:480px){ .chart-wrap{ height:220px; } .chart-wrap.small{ height:190px; } }
   @media (prefers-reduced-motion: reduce){ .hero, .card, .page.active{ animation:none; } }
 </style>
 </head>
@@ -268,6 +287,10 @@
             <div class="seg-btn active" data-trackmode="page">الصفحات</div>
             <div class="seg-btn" data-trackmode="surah">السور</div>
           </div>
+          <div class="segmented" style="max-width:220px;">
+            <div class="seg-btn active" data-trackdir="asc">تصاعدي</div>
+            <div class="seg-btn" data-trackdir="desc">تنازلي</div>
+          </div>
           <div class="progress-pill">نسبة الإنجاز: <b id="progressPct">0%</b></div>
         </div>
         <div class="gtable" id="quranGtable">
@@ -310,11 +333,15 @@
         </div>
         <div class="chart-block">
           <h3>📈 الإنجاز اليومي وتطور النسبة</h3>
-          <canvas id="lineChart" height="140"></canvas>
+          <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
+        </div>
+        <div class="chart-block">
+          <h3>📊 الإنجاز الأسبوعي</h3>
+          <div class="chart-wrap"><canvas id="weekChart"></canvas></div>
         </div>
         <div class="chart-block">
           <h3>🥧 توزيع مستوى الإنجاز</h3>
-          <div id="planDonutWrap"><canvas id="donutChartPlan" height="180"></canvas></div>
+          <div id="planDonutWrap" class="chart-wrap small"><canvas id="donutChartPlan"></canvas></div>
           <div class="chart-empty" id="planDonutEmpty" style="display:none;">لا توجد بيانات كافية بعد</div>
         </div>
       </div>
@@ -337,9 +364,9 @@
         <div class="chart-block">
           <h3>🥧 توزيعات مستوى الإنجاز</h3>
           <div id="quranDonutWrap" class="donut-row">
-            <div class="donut-item"><canvas id="donutHifz" height="150"></canvas><p>📖 الحفظ</p></div>
-            <div class="donut-item"><canvas id="donutTajweed" height="150"></canvas><p>✨ التجويد</p></div>
-            <div class="donut-item"><canvas id="donutThabit" height="150"></canvas><p>🔄 التثبيت</p></div>
+            <div class="donut-item"><div class="chart-wrap small"><canvas id="donutHifz"></canvas></div><p>📖 الحفظ</p></div>
+            <div class="donut-item"><div class="chart-wrap small"><canvas id="donutTajweed"></canvas></div><p>✨ التجويد</p></div>
+            <div class="donut-item"><div class="chart-wrap small"><canvas id="donutThabit"></canvas></div><p>🔄 التثبيت</p></div>
           </div>
           <div class="chart-empty" id="quranDonutEmpty" style="display:none;">لا توجد بيانات كافية بعد</div>
         </div>
@@ -376,7 +403,7 @@
 
         <div class="field">
           <div class="field-label">اسم الخطة</div>
-          <input type="text" id="settingsPlanName" placeholder="الخطة الأولى">
+          <input type="text" id="settingsPlanName" placeholder="مثال: خطة حفظ القرآن">
         </div>
 
         <div class="field">
@@ -439,6 +466,20 @@
             </div>
             <select id="settingsJuzSelect"></select>
             <select id="settingsSurahSelect" style="display:none;"></select>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label"><span class="em">🗓️</span> أيام الحفظ في الأسبوع</div>
+          <p class="hint" style="margin-bottom:10px;">اختر الأيام التي تريد المتابعة فيها؛ الأيام غير المختارة تكون أيام راحة.</p>
+          <div class="chip-row" id="weekdayPicker">
+            <div class="chip selectable active" data-day="0">الأحد</div>
+            <div class="chip selectable active" data-day="1">الاثنين</div>
+            <div class="chip selectable active" data-day="2">الثلاثاء</div>
+            <div class="chip selectable active" data-day="3">الأربعاء</div>
+            <div class="chip selectable active" data-day="4">الخميس</div>
+            <div class="chip selectable active" data-day="5">الجمعة</div>
+            <div class="chip selectable active" data-day="6">السبت</div>
           </div>
         </div>
 
@@ -623,9 +664,10 @@ let activeContext = null;
 let homeMode = 'hero';
 let creatingNewPlan = false;
 let trackMode = 'page';
+let trackDir = 'asc';
 const trackingStore = {};
 const planSchedules = {};
-let chartLine=null, chartDonutPlan=null, chartDonutHifz=null, chartDonutTajweed=null, chartDonutThabit=null;
+let chartLine=null, chartWeek=null, chartDonutPlan=null, chartDonutHifz=null, chartDonutTajweed=null, chartDonutThabit=null;
 
 function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function getPlan(ctx){ const id = ctx.replace('plan:',''); return plans.find(p=>p.id===id); }
@@ -643,8 +685,8 @@ function showPage(pageId){
   if(pageId === 'achievements'){ refreshAchievements(); }
   if(pageId === 'settings' && !creatingNewPlan){ loadSettingsForContext(); }
 }
-document.querySelectorAll('.pill[data-page]').forEach(b=> b.addEventListener('click', ()=>{ creatingNewPlan = false; showPage(b.dataset.page); }));
-document.getElementById('brandHome').addEventListener('click', ()=>{ creatingNewPlan = false; homeMode = activeContext ? homeMode : 'hero'; showPage('home'); });
+document.querySelectorAll('.pill[data-page]').forEach(b=> b.addEventListener('click', ()=>{ creatingNewPlan = false; settingsMinimal = false; showPage(b.dataset.page); }));
+document.getElementById('brandHome').addEventListener('click', ()=>{ creatingNewPlan = false; settingsMinimal = false; homeMode = activeContext ? homeMode : 'hero'; showPage('home'); });
 
 function setContext(ctx){
   creatingNewPlan = false;
@@ -666,7 +708,9 @@ function renderHome(){
 }
 document.getElementById('editPlanBtn').addEventListener('click', ()=>{
   creatingNewPlan = false;
+  settingsMinimal = true;
   showPage('settings');
+  loadSettingsForContext();
 });
 document.getElementById('navQuran').dataset.context = 'quran';
 document.getElementById('navQuran').classList.add('context-pill');
@@ -729,6 +773,18 @@ applySettingsDirDefault();
 document.querySelectorAll('[data-follow-settings]').forEach(btn=>{
   btn.addEventListener('click', ()=>{ document.querySelectorAll('[data-follow-settings]').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); });
 });
+document.querySelectorAll('#weekdayPicker .chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    chip.classList.toggle('active');
+    if(!document.querySelectorAll('#weekdayPicker .chip.active').length) chip.classList.add('active'); // never allow zero days
+  });
+});
+function getSelectedWeekdays(){
+  return Array.from(document.querySelectorAll('#weekdayPicker .chip.active')).map(c=>parseInt(c.dataset.day));
+}
+function setSelectedWeekdays(days){
+  document.querySelectorAll('#weekdayPicker .chip').forEach(c=> c.classList.toggle('active', days.includes(parseInt(c.dataset.day))));
+}
 
 function resetJourneyForm(){
   document.getElementById('settingsPlanName').value='';
@@ -742,10 +798,13 @@ function resetJourneyForm(){
   document.querySelectorAll('[data-settings-mode]').forEach(b=>b.classList.toggle('active', b.dataset.settingsMode==='جزء'));
   settingsDirection='تصاعدي'; settingsTargetMode='جزء';
   sJuzEl.style.display='block'; sSurahEl.style.display='none';
+  setSelectedWeekdays([0,1,2,3,4,5,6]);
   applySettingsDirDefault();
 }
+let settingsMinimal = false;
 function openNewPlanForm(){
   creatingNewPlan = true;
+  settingsMinimal = true;
   resetJourneyForm();
   document.getElementById('settingsContextHint').textContent = 'إعداد خطة جديدة';
   document.getElementById('settingsSaveBtn').textContent = '💾 إنشاء الخطة';
@@ -754,7 +813,7 @@ function openNewPlanForm(){
   showPage('settings');
 }
 function loadSettingsForContext(){
-  document.getElementById('settingsExtraBlocks').style.display = 'block';
+  document.getElementById('settingsExtraBlocks').style.display = settingsMinimal ? 'none' : 'block';
   const hint = document.getElementById('settingsContextHint');
   const saveBtn = document.getElementById('settingsSaveBtn');
   if(activeContext && activeContext.startsWith('plan:')){
@@ -765,6 +824,7 @@ function loadSettingsForContext(){
     document.getElementById('settingsEndDateG').value = plan.endG || '';
     document.getElementById('settingsUnit').value = plan.unit;
     document.getElementById('settingsQuantity').value = plan.qty;
+    setSelectedWeekdays(plan.activeDays || [0,1,2,3,4,5,6]);
     document.querySelectorAll('[data-follow-settings]').forEach(b=> b.classList.toggle('active', b.dataset.followSettings === plan.followType));
     document.querySelectorAll('[data-settings-dir]').forEach(b=> b.classList.toggle('active', b.dataset.settingsDir === plan.direction));
     document.querySelectorAll('[data-settings-mode]').forEach(b=> b.classList.toggle('active', b.dataset.settingsMode === plan.targetMode));
@@ -783,6 +843,7 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
   const rawTarget = settingsTargetMode==='جزء' ? sJuzEl.value : sSurahEl.value;
   const targetDisplay = settingsTargetMode==='جزء' ? ('الجزء '+rawTarget) : rawTarget;
   const followBtn = document.querySelector('[data-follow-settings].active');
+  const activeDays = getSelectedWeekdays();
 
   if(creatingNewPlan){
     const id = 'p' + (++planIdCounter);
@@ -793,6 +854,7 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
       unit: document.getElementById('settingsUnit').value,
       qty: document.getElementById('settingsQuantity').value,
       direction: settingsDirection, targetMode: settingsTargetMode, rawTarget, target: targetDisplay,
+      activeDays,
       followType: followBtn ? followBtn.dataset.followSettings : 'لم يُحدَّد'
     };
     plans.push(plan);
@@ -809,6 +871,7 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
     plan.endG = document.getElementById('settingsEndDateG').value;
     plan.unit = document.getElementById('settingsUnit').value;
     plan.qty = document.getElementById('settingsQuantity').value;
+    plan.activeDays = activeDays;
     plan.direction = settingsDirection; plan.targetMode = settingsTargetMode; plan.rawTarget = rawTarget; plan.target = targetDisplay;
     if(followBtn) plan.followType = followBtn.dataset.followSettings;
     buildPlanSchedule(plan);
@@ -836,8 +899,10 @@ function buildQuranTable(){
   const store = getStore('quran', trackMode);
   const unitLabel = trackMode==='page' ? 'الصفحة' : 'السورة';
   document.getElementById('unitColHeader').textContent = unitLabel;
+  let indices = Array.from({length: store.length}, (_, i) => i);
+  if(trackDir === 'desc') indices.reverse();
   let rowsHTML = [];
-  for(let i=0;i<store.length;i++){
+  for(const i of indices){
     const r = store[i]; const label = trackMode==='page' ? (i+1) : surahs[i];
     rowsHTML.push(`<div class="gtable-row">
       <div class="unit-cell" data-label="${unitLabel}">${label}</div>
@@ -868,6 +933,9 @@ function updateQuranProgress(){
 document.querySelectorAll('[data-trackmode]').forEach(btn=>{
   btn.addEventListener('click', ()=>{ document.querySelectorAll('[data-trackmode]').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); trackMode = btn.dataset.trackmode; buildQuranTable(); });
 });
+document.querySelectorAll('[data-trackdir]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{ document.querySelectorAll('[data-trackdir]').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); trackDir = btn.dataset.trackdir; buildQuranTable(); });
+});
 
 /* ================= PLAN DAY-SCHEDULE TABLE ================= */
 function buildPlanSchedule(plan){
@@ -885,10 +953,14 @@ function buildPlanSchedule(plan){
   }
   const rows = [];
   let cursor = 0;
+  const activeDays = (plan.activeDays && plan.activeDays.length) ? plan.activeDays : [0,1,2,3,4,5,6];
   for(let i=0;i<totalDays;i++){
     const d = new Date(start.getTime()+i*86400000);
     let targetLabel = 'الخطة مكتملة 🎉';
-    if(plan.targetMode === 'جزء'){
+    const isRestDay = !activeDays.includes(d.getDay());
+    if(isRestDay){
+      targetLabel = '🌙 يوم راحة';
+    } else if(plan.targetMode === 'جزء'){
       const startIdx = cursor % sequence.length;
       const segs = []; let remaining = pagesPerDay, idx = startIdx;
       while(remaining>0){ const take = Math.min(remaining, sequence.length-idx); segs.push(sequence.slice(idx, idx+take)); remaining -= take; idx = 0; }
@@ -913,7 +985,7 @@ function buildPlanSchedule(plan){
       targetLabel = idxs.map(ix=>surahs[ix]).join('، ');
     }
     const prev = prevRows[i];
-    rows.push({ date: fmtDateInput(new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))), dayName: dayNamesAr[d.getDay()], target: targetLabel,
+    rows.push({ date: fmtDateInput(new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))), dayName: dayNamesAr[d.getDay()], target: targetLabel, isRestDay,
       hifz: prev?prev.hifz:0, note: prev?prev.note:'', done: prev?prev.done:false });
   }
   planSchedules[plan.id] = rows;
@@ -939,16 +1011,17 @@ function buildPlanTable(plan){
     chip.addEventListener('click', ()=>{ planTableFilter = chip.dataset.filter; buildPlanTable(plan); });
   });
   const visibleRows = rows.map((r,i)=>({r,i})).filter(({r})=> planTableFilter==='all' || (planTableFilter==='done'&&r.done) || (planTableFilter==='remaining'&&!r.done));
-  document.getElementById('planTableBody').innerHTML = visibleRows.map(({r,i})=>`<div class="gtable-row">
+  document.getElementById('planTableBody').innerHTML = visibleRows.map(({r,i})=>`<div class="gtable-row ${r.isRestDay?'rest-row':''}">
     <div data-label="#">${i+1}</div>
     <div data-label="التاريخ">${r.date}</div>
     <div data-label="اليوم">${r.dayName}</div>
     <div data-label="الهدف اليومي">${escapeHtml(r.target)}</div>
-    <div data-label="مستوى الحفظ">${buildLevelSelect(levelsHifz,'hifz',i,r.hifz)}</div>
-    <div data-label="ملاحظات"><input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="ملاحظة..."></div>
+    <div data-label="مستوى الحفظ">${r.isRestDay ? '—' : buildLevelSelect(levelsHifz,'hifz',i,r.hifz)}</div>
+    <div data-label="ملاحظات"><input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="${r.isRestDay?'سبب الإجازة (اختياري)...':'ملاحظة...'}"></div>
     <div class="ach-cell gcell-actions" data-label="الإنجاز">
+      ${r.isRestDay ? '—' : `
       <button class="icon-btn done-btn" data-idx="${i}" title="${r.done?'تراجع':'إنجاز'}">${r.done?'↩️':'✔️'}</button>
-      <button class="icon-btn trash-btn" data-idx="${i}" title="إعادة تعيين">🗑️</button>
+      <button class="icon-btn trash-btn" data-idx="${i}" title="إعادة تعيين">🗑️</button>`}
     </div>
   </div>`).join('');
   document.querySelectorAll('#planTableBody select').forEach(sel=> sel.addEventListener('change', ()=>{ rows[sel.dataset.idx][sel.dataset.col] = sel.selectedIndex; }));
@@ -964,19 +1037,18 @@ function buildPlanTable(plan){
   }));
 }
 function burstConfetti(el){
-  const rect = el.getBoundingClientRect();
-  const originX = rect.left + rect.width/2;
   const colors = ['#b7ecd4','#a9d8ec','#c9bdf0','#ffd88a','#f7a8c4'];
-  for(let i=0;i<28;i++){
+  for(let i=0;i<32;i++){
     const p = document.createElement('div'); p.className='confetti-piece';
-    const spread = (Math.random()*260-130);
-    p.style.left = Math.min(window.innerWidth-10, Math.max(10, originX + spread)) + 'px';
+    const fromRight = i % 2 === 0;
+    p.classList.add(fromRight ? 'from-right' : 'from-left');
     p.style.width = (5+Math.random()*4)+'px'; p.style.height = p.style.width;
     p.style.background = colors[i%colors.length];
-    p.style.setProperty('--dx', (Math.random()*60-30)+'px');
-    p.style.setProperty('--dy', (window.innerHeight*0.5 + Math.random()*window.innerHeight*0.4)+'px');
-    p.style.animationDelay = (Math.random()*0.25)+'s';
-    document.body.appendChild(p); setTimeout(()=>p.remove(), 1600);
+    const travel = window.innerWidth*0.45 + Math.random()*window.innerWidth*0.25;
+    p.style.setProperty('--dx', (fromRight ? -travel : travel)+'px');
+    p.style.setProperty('--dy', (Math.random()*window.innerHeight*0.6 + 60)+'px');
+    p.style.animationDelay = (Math.random()*0.3)+'s';
+    document.body.appendChild(p); setTimeout(()=>p.remove(), 1700);
   }
 }
 
@@ -1021,7 +1093,21 @@ function refreshStats(){
     document.getElementById('quranDonutWrap').style.display = empty ? 'none':'flex';
     if(!empty && window.Chart){
       const countLevels = (arr,key)=>{ const counts=new Array(arr.length).fill(0); pageStore.forEach(r=>counts[r[key]]++); return counts; };
-      const mk=(id,labels,data,chartVar)=>{ if(chartVar) chartVar.destroy(); const ctx=document.getElementById(id).getContext('2d'); return new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:['#e7e3f5','#cbb8f0','#a9d8ec','#8fd9b6','#6ac9a0','#4fae8c']}]},options:{plugins:{legend:{display:false}}}}); };
+      const mk=(id,labels,data,chartVar)=>{
+        if(chartVar) chartVar.destroy();
+        const ctx=document.getElementById(id).getContext('2d');
+        return new Chart(ctx,{
+          type:'doughnut',
+          data:{labels, datasets:[{data, backgroundColor:['#e7e3f5','#cbb8f0','#a9d8ec','#8fd9b6','#6ac9a0','#4fae8c'], borderColor:'#fff', borderWidth:2}]},
+          options:{
+            responsive:true, maintainAspectRatio:false, cutout:'62%',
+            plugins:{
+              legend:{ position:'bottom', labels:{ font:{size:10.5}, boxWidth:12, padding:10, usePointStyle:true } },
+              tooltip:{ callbacks:{ label: ctx => `${ctx.label}: ${ctx.parsed} صفحة` } }
+            }
+          }
+        });
+      };
       chartDonutHifz = mk('donutHifz', levelsHifz, countLevels(levelsHifz,'hifz'), chartDonutHifz);
       chartDonutTajweed = mk('donutTajweed', levelsTajweed, countLevels(levelsTajweed,'tajweed'), chartDonutTajweed);
       chartDonutThabit = mk('donutThabit', levelsThabit, countLevels(levelsThabit,'thabit'), chartDonutThabit);
@@ -1043,8 +1129,43 @@ function refreshStats(){
       let running=0; const lineData = rows.map(r=>{ if(r.done) running++; return rows.length?Math.round(running/rows.length*100):0; });
       if(chartLine) chartLine.destroy();
       chartLine = new Chart(document.getElementById('lineChart').getContext('2d'), {
-        type:'line', data:{ labels: rows.map((r,i)=>i+1), datasets:[{data:lineData, borderColor:'#4fae8c', backgroundColor:'rgba(79,174,140,.15)', fill:true, tension:.3, pointRadius:0}] },
-        options:{ plugins:{legend:{display:false}}, scales:{ y:{ min:0, max:100, ticks:{callback:v=>v+'%'} }, x:{ title:{display:true, text:'يوم الخطة'} } } }
+        type:'line',
+        data:{ labels: rows.map((r,i)=>i+1), datasets:[{
+          label:'نسبة الإنجاز', data:lineData,
+          borderColor:'#2f8f6e', backgroundColor:'rgba(79,174,140,.18)',
+          fill:true, tension:.3, borderWidth:2.5,
+          pointRadius:2, pointHoverRadius:5, pointBackgroundColor:'#2f8f6e'
+        }] },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          interaction:{ mode:'index', intersect:false },
+          plugins:{
+            legend:{ display:false },
+            tooltip:{ callbacks:{ title: items=>'اليوم '+items[0].label, label: ctx=>'الإنجاز: '+ctx.parsed.y+'%' } }
+          },
+          scales:{
+            y:{ min:0, max:100, grid:{color:'#eee9fb'}, ticks:{callback:v=>v+'%', font:{size:11}} },
+            x:{ grid:{display:false}, title:{display:true, text:'يوم الخطة', font:{size:11}}, ticks:{maxTicksLimit:10, font:{size:10}} }
+          }
+        }
+      });
+
+      const weeks = [];
+      for(let i=0;i<rows.length;i+=7){ weeks.push(rows.slice(i,i+7)); }
+      const weekLabels = weeks.map((w,i)=>'أسبوع '+(i+1));
+      const weekData = weeks.map(w=> w.length ? Math.round(w.filter(r=>r.done).length/w.length*100) : 0);
+      if(chartWeek) chartWeek.destroy();
+      chartWeek = new Chart(document.getElementById('weekChart').getContext('2d'), {
+        type:'bar',
+        data:{ labels: weekLabels, datasets:[{ label:'الإنجاز الأسبوعي', data:weekData, backgroundColor:'#a9d8ec', hoverBackgroundColor:'#8fc7e0', borderRadius:8, maxBarThickness:42 }] },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>'الإنجاز: '+ctx.parsed.y+'%' } } },
+          scales:{
+            y:{ min:0, max:100, grid:{color:'#eee9fb'}, ticks:{callback:v=>v+'%', font:{size:11}} },
+            x:{ grid:{display:false}, ticks:{font:{size:10.5}} }
+          }
+        }
       });
     }
     const empty = st.doneDays===0;
@@ -1054,7 +1175,17 @@ function refreshStats(){
       const counts = new Array(levelsHifz.length).fill(0);
       rows.forEach(r=>counts[r.hifz]++);
       if(chartDonutPlan) chartDonutPlan.destroy();
-      chartDonutPlan = new Chart(document.getElementById('donutChartPlan').getContext('2d'), { type:'doughnut', data:{labels:levelsHifz, datasets:[{data:counts, backgroundColor:['#e7e3f5','#cbb8f0','#a9d8ec','#8fd9b6','#6ac9a0','#4fae8c']}]}, options:{plugins:{legend:{position:'bottom', labels:{font:{size:10}}}}} });
+      chartDonutPlan = new Chart(document.getElementById('donutChartPlan').getContext('2d'), {
+        type:'doughnut',
+        data:{labels:levelsHifz, datasets:[{data:counts, backgroundColor:['#e7e3f5','#cbb8f0','#a9d8ec','#8fd9b6','#6ac9a0','#4fae8c'], borderColor:'#fff', borderWidth:2}]},
+        options:{
+          responsive:true, maintainAspectRatio:false, cutout:'62%',
+          plugins:{
+            legend:{ position:'bottom', labels:{font:{size:10.5}, boxWidth:12, padding:10, usePointStyle:true} },
+            tooltip:{ callbacks:{ label: ctx => `${ctx.label}: ${ctx.parsed} يوم` } }
+          }
+        }
+      });
     }
   }
 }
