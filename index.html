@@ -38,7 +38,8 @@
   .topnav{ position:sticky; top:0; z-index:50; background:#ffffffee; backdrop-filter:blur(14px); border-bottom:1px solid var(--line); padding:12px 20px; }
   .topnav.nav-hidden{ display:none; }
   .nav-row{ max-width:1200px; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
-  .nav-row.single{ justify-content:flex-start; }
+  .nav-row.row1{ padding-bottom:10px; margin-bottom:8px; border-bottom:1px dashed var(--line); }
+  .nav-row.row2{ justify-content:flex-start; }
   .nav-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
   @media (max-width:760px){
     .topnav{ padding:10px 12px; }
@@ -157,6 +158,7 @@
   .chart-block h3{ font-size:14.5px; margin:0 0 14px; }
   .chart-empty{ text-align:center; font-size:12.5px; color:#9691b0; padding:24px 0; }
   .chart-caption{ text-align:left; font-size:12px; color:var(--ink-soft); margin:8px 2px 0; }
+  .chart-desc{ font-size:12px; color:var(--ink-soft); line-height:1.9; margin:0 0 16px; }
   .donut-row{ display:flex; flex-wrap:wrap; gap:16px; }
   .donut-item{ flex:1; min-width:150px; text-align:center; }
   .donut-item p{ font-size:12px; font-weight:700; margin:8px 0 0; }
@@ -198,6 +200,15 @@
   .chip{ border:1.5px solid var(--line); border-radius:11px; padding:8px 13px; font-size:12.5px; background:#faf9ff; }
   .chip.selectable{ cursor:pointer; font-family:var(--font-main); }
   .chip.selectable.active{ background:var(--grad); border-color:transparent; font-weight:700; }
+  .add-level-row{ display:flex; gap:8px; margin-top:10px; }
+  .add-level-row input{ flex:1; padding:9px 12px; border-radius:11px; border:1.5px solid var(--line); background:#faf9ff; font-family:var(--font-main); font-size:12.5px; }
+  .add-level-btn{ border:1.5px solid var(--line); background:#f4f2fb; border-radius:11px; padding:9px 14px; font-size:12.5px; font-weight:700; cursor:pointer; font-family:var(--font-main); white-space:nowrap; }
+  .add-level-btn:hover{ border-color:#a9d8ec; }
+  .palette-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(120px,1fr)); gap:14px; }
+  .palette-card{ border:2px solid transparent; border-radius:16px; padding:4px; cursor:pointer; transition:all .18s ease; box-shadow:0 4px 14px -6px rgba(35,32,66,.18); }
+  .palette-card:hover{ transform:translateY(-2px); box-shadow:0 8px 18px -6px rgba(35,32,66,.28); }
+  .palette-card.active{ border-color:var(--ink); }
+  .palette-preview{ height:56px; border-radius:12px; }
   .toggle-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; font-size:13.5px; }
   .switch{ position:relative; width:42px; height:23px; }
   .switch input{ opacity:0; width:0; height:0; }
@@ -239,16 +250,18 @@
 <div class="glow a"></div><div class="glow b"></div><div class="glow c"></div>
 
 <nav class="topnav nav-hidden" id="topNav">
-  <div class="nav-row single">
-    <button class="brand" id="brandHome">في رحاب القرآن الكريم <span class="ic">🏠</span></button>
-    <div class="nav-group" id="planPills"></div>
-    <button class="pill" id="navQuran">📋 متابعة حفظ القرآن</button>
-    <button class="pill action" id="navNewPlan">➕ خطة جديدة</button>
+  <div class="nav-row row1">
+    <button class="brand" id="brandHome"><span class="ic">🏠</span> في رحاب القرآن الكريم</button>
     <button class="pill active-pill" data-page="home">🏠 الرئيسية</button>
     <button class="pill" data-page="stats">📊 الإحصائيات</button>
     <button class="pill" data-page="calendar">📅 التقويم</button>
     <button class="pill" data-page="achievements">🏆 الإنجازات</button>
     <button class="pill" data-page="settings">⚙️ الإعدادات</button>
+  </div>
+  <div class="nav-row row2">
+    <div class="nav-group" id="planPills"></div>
+    <button class="pill" id="navQuran">📋 متابعة حفظ القرآن</button>
+    <button class="pill action" id="navNewPlan">➕ خطة جديدة</button>
   </div>
 </nav>
 
@@ -333,7 +346,7 @@
           <p class="chart-caption" id="bestWeekCaption"></p>
         </div>
         <div class="chart-block">
-          <h3>🥧 توزيع مستوى الإنجاز</h3>
+          <h3>🧩 توزيع مستوى الإنجاز</h3>
           <div id="planDonutWrap" class="chart-wrap"><canvas id="donutChartPlan"></canvas></div>
           <div class="chart-empty" id="planDonutEmpty" style="display:none;">لا توجد بيانات كافية بعد</div>
         </div>
@@ -341,27 +354,32 @@
 
       <div id="statsQuranBlock" style="display:none;">
         <div class="stat-grid">
-          <div class="stat-tile"><span class="em">📊</span><div class="val" id="sqPct">0%</div><div class="lbl">نسبة إنجاز القرآن</div></div>
-          <div class="stat-tile"><span class="em">📘</span><div class="val" id="sqJuz">0</div><div class="lbl">الأجزاء المحفوظة</div></div>
-          <div class="stat-tile"><span class="em">📘</span><div class="val" id="sqHizb">0</div><div class="lbl">الأحزاب المحفوظة</div></div>
+          <div class="stat-tile"><span class="em">📊</span><div class="val" id="sqPct">0%</div><div class="lbl">نسبة الإنجاز</div></div>
+          <div class="stat-tile"><span class="em">📘</span><div class="val" id="sqJuz">0</div><div class="lbl">عدد الأجزاء</div></div>
+          <div class="stat-tile"><span class="em">📗</span><div class="val" id="sqHizb">0</div><div class="lbl">عدد الأحزاب</div></div>
           <div class="stat-tile"><span class="em">📚</span><div class="val" id="sqSurah">0</div><div class="lbl">السور المحفوظة</div></div>
           <div class="stat-tile"><span class="em">📄</span><div class="val" id="sqPages">0</div><div class="lbl">الصفحات المحفوظة</div></div>
           <div class="stat-tile"><span class="em">⏳</span><div class="val" id="sqJuzLeft">30</div><div class="lbl">الأجزاء المتبقية</div></div>
           <div class="stat-tile"><span class="em">⏳</span><div class="val" id="sqHizbLeft">60</div><div class="lbl">الأحزاب المتبقية</div></div>
-          <div class="stat-tile"><span class="em">⏳</span><div class="val" id="sqPagesLeft">604</div><div class="lbl">الصفحات المتبقية</div></div>
+          <div class="stat-tile"><span class="em">📈</span><div class="val" id="sqAvg">0%</div><div class="lbl">متوسط الإنجاز</div></div>
+        </div>
+        <div class="chart-block">
+          <h3>📈 الإنجاز وتطور النسبة</h3>
+          <div class="chart-wrap"><canvas id="lineChartQuran"></canvas></div>
+        </div>
+        <div class="chart-block">
+          <h3>📊 الإنجاز حسب الأجزاء</h3>
+          <div class="chart-wrap"><canvas id="weekChartQuran"></canvas></div>
+          <p class="chart-caption" id="bestJuzCaption"></p>
+        </div>
+        <div class="chart-block">
+          <h3>🧩 توزيع مستوى الإنجاز</h3>
+          <div id="quranPieWrap" class="chart-wrap"><canvas id="donutChartQuran"></canvas></div>
+          <div class="chart-empty" id="quranPieEmpty" style="display:none;">لا توجد بيانات كافية بعد</div>
         </div>
         <div class="chart-block">
           <h3>📘 تقدّم الأجزاء (مرّر للتفاصيل)</h3>
           <div class="cal-grid" id="juzProgressGrid" style="grid-template-columns:repeat(10,1fr);"></div>
-        </div>
-        <div class="chart-block">
-          <h3>🥧 توزيعات مستوى الإنجاز</h3>
-          <div id="quranDonutWrap" class="donut-row">
-            <div class="donut-item"><div class="chart-wrap small"><canvas id="donutHifz"></canvas></div><p>📖 الحفظ</p></div>
-            <div class="donut-item"><div class="chart-wrap small"><canvas id="donutTajweed"></canvas></div><p>✨ التجويد</p></div>
-            <div class="donut-item"><div class="chart-wrap small"><canvas id="donutThabit"></canvas></div><p>🔄 التثبيت</p></div>
-          </div>
-          <div class="chart-empty" id="quranDonutEmpty" style="display:none;">لا توجد بيانات كافية بعد</div>
         </div>
       </div>
     </section>
@@ -486,12 +504,31 @@
         </div>
 
         <button class="save-btn" id="settingsSaveBtn" type="button">💾 حفظ إعدادات الرحلة</button>
+        <p class="hint" id="journeyFormError" style="display:none; color:#c0392b; font-weight:700; text-align:center; margin-top:10px;"></p>
       </div>
 
       <div id="settingsExtraBlocks">
-        <div class="settings-block"><h3>🏆 مستوى الحفظ</h3><div class="chip-row" id="chipsHifz"></div></div>
-        <div class="settings-block"><h3>🎯 مستوى الثبيت</h3><div class="chip-row" id="chipsThabit"></div></div>
-        <div class="settings-block"><h3>📿 مستوى التجويد</h3><div class="chip-row" id="chipsTajweed"></div></div>
+        <div class="settings-block">
+          <h3>🏆 مستوى الحفظ</h3>
+          <div class="chip-row" id="chipsHifz"></div>
+          <div class="add-level-row"><input type="text" id="newLevelHifz" placeholder="أضف مستوى جديد (مثال: 🌟 ممتاز جدًا)"><button class="add-level-btn" data-target="hifz">➕ إضافة</button></div>
+        </div>
+        <div class="settings-block">
+          <h3>🎯 مستوى الثبيت</h3>
+          <div class="chip-row" id="chipsThabit"></div>
+          <div class="add-level-row"><input type="text" id="newLevelThabit" placeholder="أضف مستوى جديد..."><button class="add-level-btn" data-target="thabit">➕ إضافة</button></div>
+        </div>
+        <div class="settings-block">
+          <h3>📿 مستوى التجويد</h3>
+          <div class="chip-row" id="chipsTajweed"></div>
+          <div class="add-level-row"><input type="text" id="newLevelTajweed" placeholder="أضف مستوى جديد..."><button class="add-level-btn" data-target="tajweed">➕ إضافة</button></div>
+        </div>
+
+        <div class="settings-block">
+          <h3>🎨 لوحة الألوان</h3>
+          <p class="desc">اختر مجموعة الألوان المفضلة لديك لمظهر الموقع.</p>
+          <div class="palette-grid" id="paletteGrid"></div>
+        </div>
 
         <div class="settings-block">
           <h3>🖋 الخط</h3>
@@ -622,9 +659,9 @@ const motivations = [
 "احفظ، كرّر، راجع، ثبّت… حتى يصبح القرآن رفيق صدرك."
 ];
 
-const levelsHifz = ["⏳ لم يكتمل","⚠️ يحتاج مراجعة","👍 جيد","✨ جيد جدًا","🎯 متقن","🏆 ممتاز"];
-const levelsThabit = ["⚠️ تحتاج تثبيت","🔴 تثبيت ضعيف","🟠 تثبيت جيد","🎯 تثبيت متقن","🏆 تثبيت راسخ"];
-const levelsTajweed = ["⚠️ يحتاج تحسين","🔴 تجويد ضعيف","🟠 تجويد جيد","🎯 تجويد متقن","🏆 تجويد راسخ"];
+let levelsHifz = ["⏳ لم يكتمل","⚠️ يحتاج مراجعة","👍 جيد","✨ جيد جدًا","🎯 متقن","🏆 ممتاز"];
+let levelsThabit = ["⚠️ تحتاج تثبيت","🔴 تثبيت ضعيف","🟠 تثبيت جيد","🎯 تثبيت متقن","🏆 تثبيت راسخ"];
+let levelsTajweed = ["⚠️ يحتاج تحسين","🔴 تجويد ضعيف","🟠 تجويد جيد","🎯 تجويد متقن","🏆 تجويد راسخ"];
 
 const planAchievementsDef = [
   {em:"🌷", t:"بداية الرحلة", d:"أنشأت خطة حفظ", test:p=>({done:1,total:1})},
@@ -660,7 +697,7 @@ let trackMode = 'page';
 let trackDir = 'asc';
 const trackingStore = {};
 const planSchedules = {};
-let chartLine=null, chartWeek=null, chartDonutPlan=null, chartDonutHifz=null, chartDonutTajweed=null, chartDonutThabit=null;
+let chartLine=null, chartWeek=null, chartDonutPlan=null, chartLineQuran=null, chartWeekQuran=null, chartDonutQuran=null;
 
 function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function getPlan(ctx){ const id = ctx.replace('plan:',''); return plans.find(p=>p.id===id); }
@@ -679,7 +716,7 @@ function showPage(pageId){
   if(pageId === 'settings' && !creatingNewPlan){ loadSettingsForContext(); }
 }
 document.querySelectorAll('.pill[data-page]').forEach(b=> b.addEventListener('click', ()=>{ creatingNewPlan = false; settingsMinimal = false; showPage(b.dataset.page); }));
-document.getElementById('brandHome').addEventListener('click', ()=>{ creatingNewPlan = false; settingsMinimal = false; homeMode = activeContext ? homeMode : 'hero'; showPage('home'); });
+document.getElementById('brandHome').addEventListener('click', ()=>{ creatingNewPlan = false; settingsMinimal = false; homeMode = 'hero'; showPage('home'); });
 
 function setContext(ctx){
   creatingNewPlan = false;
@@ -780,6 +817,7 @@ function setSelectedWeekdays(days){
 }
 
 function resetJourneyForm(){
+  document.getElementById('journeyFormError').style.display = 'none';
   document.getElementById('settingsPlanName').value='';
   document.getElementById('settingsStartDateG').value='';
   document.getElementById('settingsEndDateG').value='';
@@ -806,6 +844,7 @@ function openNewPlanForm(){
   showPage('settings');
 }
 function loadSettingsForContext(){
+  document.getElementById('journeyFormError').style.display = 'none';
   document.getElementById('settingsExtraBlocks').style.display = settingsMinimal ? 'none' : 'block';
   const hint = document.getElementById('settingsContextHint');
   const saveBtn = document.getElementById('settingsSaveBtn');
@@ -833,6 +872,21 @@ function loadSettingsForContext(){
   }
 }
 document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
+  const errEl = document.getElementById('journeyFormError');
+  errEl.style.display = 'none';
+  const nameVal = document.getElementById('settingsPlanName').value.trim();
+  const startVal = document.getElementById('settingsStartDateG').value;
+  const endVal = document.getElementById('settingsEndDateG').value;
+  const missing = [];
+  if(!nameVal) missing.push('اسم الخطة');
+  if(!startVal) missing.push('تاريخ البداية');
+  if(!endVal) missing.push('تاريخ النهاية');
+  if(startVal && endVal && new Date(endVal) < new Date(startVal)) missing.push('تاريخ نهاية صحيح (بعد تاريخ البداية)');
+  if(missing.length){
+    errEl.textContent = '⚠️ الرجاء إكمال الحقول التالية: ' + missing.join('، ');
+    errEl.style.display = 'block';
+    return;
+  }
   const rawTarget = settingsTargetMode==='جزء' ? sJuzEl.value : sSurahEl.value;
   const targetDisplay = settingsTargetMode==='جزء' ? ('الجزء '+rawTarget) : rawTarget;
   const followBtn = document.querySelector('[data-follow-settings].active');
@@ -841,9 +895,9 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
   if(creatingNewPlan){
     const id = 'p' + (++planIdCounter);
     const plan = {
-      id, name: document.getElementById('settingsPlanName').value || ('الخطة ' + (planIdCounter===1?'الأولى':planIdCounter)),
-      startG: document.getElementById('settingsStartDateG').value,
-      endG: document.getElementById('settingsEndDateG').value,
+      id, name: nameVal,
+      startG: startVal,
+      endG: endVal,
       unit: document.getElementById('settingsUnit').value,
       qty: document.getElementById('settingsQuantity').value,
       direction: settingsDirection, targetMode: settingsTargetMode, rawTarget, target: targetDisplay,
@@ -1010,7 +1064,7 @@ function buildPlanTable(plan){
     <div data-label="اليوم">${r.dayName}</div>
     <div data-label="الهدف اليومي">${escapeHtml(r.target)}</div>
     <div data-label="مستوى الحفظ">${r.isRestDay ? '—' : buildLevelSelect(levelsHifz,'hifz',i,r.hifz)}</div>
-    <div data-label="ملاحظات"><input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="${r.isRestDay?'سبب الإجازة (اختياري)...':'ملاحظة...'}"></div>
+    <div data-label="ملاحظات"><input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="ملاحظة..."></div>
     <div class="ach-cell gcell-actions" data-label="الإنجاز">
       ${r.isRestDay ? '—' : `
       <button class="icon-btn done-btn" data-idx="${i}" title="${r.done?'تراجع':'إنجاز'}">${r.done?'↩️':'✔️'}</button>
@@ -1076,7 +1130,7 @@ function refreshStats(){
     document.getElementById('sqPages').textContent = pagesDone;
     document.getElementById('sqJuzLeft').textContent = 30-juzDone;
     document.getElementById('sqHizbLeft').textContent = 60-hizbDone;
-    document.getElementById('sqPagesLeft').textContent = 604-pagesDone;
+    document.getElementById('sqAvg').textContent = Math.round(pagesDone/604*100)+'%';
 
     const juzGrid = document.getElementById('juzProgressGrid');
     juzGrid.innerHTML = juzRanges.map((rg,i)=>{
@@ -1087,29 +1141,66 @@ function refreshStats(){
       return `<div class="cal-cell ${done?'done':''}" title="${escapeHtml(title)}" style="aspect-ratio:auto; padding:8px 2px;"><span class="g">${n}</span></div>`;
     }).join('');
 
-    const empty = pagesDone===0;
-    document.getElementById('quranDonutEmpty').style.display = empty ? 'block':'none';
-    document.getElementById('quranDonutWrap').style.display = empty ? 'none':'flex';
-    if(!empty && window.Chart){
-      const countLevels = (arr,key)=>{ const counts=new Array(arr.length).fill(0); pageStore.forEach(r=>counts[r[key]]++); return counts; };
-      const mk=(id,labels,data,chartVar)=>{
-        if(chartVar) chartVar.destroy();
-        const ctx=document.getElementById(id).getContext('2d');
-        return new Chart(ctx,{
-          type:'doughnut',
-          data:{labels, datasets:[{data, backgroundColor:['#e7e3f5','#cbb8f0','#a9d8ec','#8fd9b6','#6ac9a0','#4fae8c'], borderColor:'#fff', borderWidth:2}]},
-          options:{
-            responsive:true, maintainAspectRatio:false, cutout:'62%',
-            plugins:{
-              legend:{ position:'bottom', labels:{ font:{size:10.5}, boxWidth:12, padding:10, usePointStyle:true } },
-              tooltip:{ callbacks:{ label: ctx => `${ctx.label}: ${ctx.parsed} صفحة` } }
-            }
+    if(window.Chart){
+      let running=0; const lineData = pageStore.map(r=>{ if(r.done) running++; return Math.round(running/604*100); });
+      const sampleEvery = 20;
+      const sampledLabels = [], sampledData = [];
+      for(let i=0;i<pageStore.length;i+=sampleEvery){ sampledLabels.push(i+1); sampledData.push(lineData[i]); }
+      sampledLabels.push(604); sampledData.push(lineData[603]);
+      if(chartLineQuran) chartLineQuran.destroy();
+      chartLineQuran = new Chart(document.getElementById('lineChartQuran').getContext('2d'), {
+        type:'line',
+        data:{ labels: sampledLabels, datasets:[{ label:'نسبة الإنجاز', data:sampledData, borderColor:'#2f8f6e', backgroundColor:'rgba(79,174,140,.18)', fill:true, tension:.3, borderWidth:2.5, pointRadius:2, pointHoverRadius:5, pointBackgroundColor:'#2f8f6e' }] },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          interaction:{ mode:'index', intersect:false },
+          plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title: items=>'الصفحة '+items[0].label, label: ctx=>'الإنجاز: '+ctx.parsed.y+'%' } } },
+          scales:{
+            y:{ min:0, max:100, grid:{color:'#eee9fb'}, ticks:{callback:v=>v+'%', font:{size:11}} },
+            x:{ grid:{display:false}, title:{display:true, text:'الصفحة', font:{size:11}}, ticks:{maxTicksLimit:10, font:{size:10}} }
           }
-        });
-      };
-      chartDonutHifz = mk('donutHifz', levelsHifz, countLevels(levelsHifz,'hifz'), chartDonutHifz);
-      chartDonutTajweed = mk('donutTajweed', levelsTajweed, countLevels(levelsTajweed,'tajweed'), chartDonutTajweed);
-      chartDonutThabit = mk('donutThabit', levelsThabit, countLevels(levelsThabit,'thabit'), chartDonutThabit);
+        }
+      });
+
+      const juzLabels = juzRanges.map((rg,i)=>'ج'+(i+1));
+      const juzData = juzRanges.map(rg=>{ let done=0; for(let p=rg[0];p<=rg[1];p++){ if(pageStore[p-1].done) done++; } return Math.round(done/(rg[1]-rg[0]+1)*100); });
+      if(chartWeekQuran) chartWeekQuran.destroy();
+      chartWeekQuran = new Chart(document.getElementById('weekChartQuran').getContext('2d'), {
+        type:'bar',
+        data:{ labels: juzLabels, datasets:[{ label:'الإنجاز حسب الجزء', data:juzData, backgroundColor: juzData.map(v => `rgba(79,174,140,${(0.22 + 0.78*(v/100)).toFixed(2)})`), borderRadius:6, maxBarThickness:26 }] },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title: items=>'الجزء '+items[0].label.replace('ج',''), label: ctx=>'الإنجاز: '+ctx.parsed.y+'%' } } },
+          scales:{
+            y:{ min:0, max:100, grid:{color:'#eee9fb'}, ticks:{callback:v=>v+'%', font:{size:11}} },
+            x:{ grid:{display:false}, ticks:{font:{size:9.5}, maxRotation:0} }
+          }
+        }
+      });
+      let bestJuzIdx = 0;
+      juzData.forEach((v,i)=>{ if(v > juzData[bestJuzIdx]) bestJuzIdx = i; });
+      const bj = document.getElementById('bestJuzCaption');
+      bj.textContent = juzData[bestJuzIdx] > 0 ? `أفضل جزء: الجزء ${bestJuzIdx+1} (${juzData[bestJuzIdx]}%)` : '';
+    }
+
+    const empty = pagesDone===0;
+    document.getElementById('quranPieEmpty').style.display = empty ? 'block':'none';
+    document.getElementById('quranPieWrap').style.display = empty ? 'none':'block';
+    if(!empty && window.Chart){
+      const counts = new Array(levelsHifz.length).fill(0);
+      pageStore.forEach(r=>counts[r.hifz]++);
+      if(chartDonutQuran) chartDonutQuran.destroy();
+      chartDonutQuran = new Chart(document.getElementById('donutChartQuran').getContext('2d'), {
+        type:'pie',
+        data:{labels:levelsHifz.map((l,i)=>`${l} (${counts[i]})`), datasets:[{data:counts, backgroundColor:['#e7e3f5','#cbb8f0','#a9d8ec','#e0a3ad','#d8b978','#8fc7d8'], borderColor:'#fff', borderWidth:2}]},
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          plugins:{
+            legend:{ position:'left', labels:{font:{size:11}, boxWidth:12, padding:10, usePointStyle:true} },
+            tooltip:{ callbacks:{ label: ctx => `${ctx.label}` } }
+          }
+        }
+      });
     }
   } else {
     const plan = getPlan(activeContext);
@@ -1158,7 +1249,7 @@ function refreshStats(){
       chartWeek = new Chart(document.getElementById('weekChart').getContext('2d'), {
         type:'bar',
         data:{ labels: weekLabels, datasets:[{ label:'الإنجاز الأسبوعي', data:weekData,
-          backgroundColor: weekData.map(v => v>=70?'#4fae8c': v>0?'#a9d8ec':'#e7e3f5'),
+          backgroundColor: weekData.map(v => `rgba(79,174,140,${(0.22 + 0.78*(v/100)).toFixed(2)})`),
           hoverBackgroundColor:'#8fc7e0', borderRadius:8, maxBarThickness:42 }] },
         options:{
           responsive:true, maintainAspectRatio:false,
@@ -1262,6 +1353,50 @@ function renderLevelChips(containerId, arr){ document.getElementById(containerId
 renderLevelChips('chipsHifz', levelsHifz);
 renderLevelChips('chipsThabit', levelsThabit);
 renderLevelChips('chipsTajweed', levelsTajweed);
+
+const levelArraysByTarget = { hifz: 'levelsHifz', thabit: 'levelsThabit', tajweed: 'levelsTajweed' };
+document.querySelectorAll('.add-level-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const target = btn.dataset.target;
+    const inputId = 'newLevel' + target.charAt(0).toUpperCase() + target.slice(1);
+    const input = document.getElementById(inputId);
+    const val = input.value.trim();
+    if(!val) return;
+    if(target==='hifz'){ levelsHifz.push(val); renderLevelChips('chipsHifz', levelsHifz); }
+    else if(target==='thabit'){ levelsThabit.push(val); renderLevelChips('chipsThabit', levelsThabit); }
+    else if(target==='tajweed'){ levelsTajweed.push(val); renderLevelChips('chipsTajweed', levelsTajweed); }
+    input.value = '';
+  });
+});
+
+const colorPalettes = [
+  { colors:['#A8DADC','#A8B89F','#F7F3EA','#B8A9C9'], accent:'#6FA8AC' },
+  { colors:['#F4B6A6','#D8A7B1','#9A7B6A','#FAF3E7'], accent:'#C97F6C' },
+  { colors:['#5B8E9E','#B8A4C9','#A8AD87','#F5F0E6'], accent:'#3F6B79' },
+  { colors:['#D99AB5','#E8D58B','#9DBCC8','#B7A0C8'], accent:'#C46F94' },
+  { colors:['#466B5D','#8DBDB5','#C9826B','#E8DCC8'], accent:'#345347' }
+];
+function renderPalettes(){
+  document.getElementById('paletteGrid').innerHTML = colorPalettes.map((p,i)=>`
+    <div class="palette-card" data-palette="${i}">
+      <div class="palette-preview" style="background:linear-gradient(120deg, ${p.colors[0]} 0%, ${p.colors[1]} 35%, ${p.colors[2]} 70%, ${p.colors[3]} 100%);"></div>
+    </div>`).join('');
+  document.querySelectorAll('.palette-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      document.querySelectorAll('.palette-card').forEach(c=>c.classList.remove('active'));
+      card.classList.add('active');
+      const p = colorPalettes[parseInt(card.dataset.palette)];
+      applyPalette(p);
+    });
+  });
+}
+function applyPalette(p){
+  const [c1,c2,c3,c4] = p.colors;
+  document.documentElement.style.setProperty('--grad', `linear-gradient(120deg, ${c1} 0%, ${c2} 55%, ${c4} 100%)`);
+  document.documentElement.style.setProperty('--grad-soft', `linear-gradient(120deg, ${c1}33 0%, ${c2}33 55%, ${c4}55 100%)`);
+  document.documentElement.style.setProperty('--ok', p.accent);
+}
+renderPalettes();
 
 document.querySelectorAll('#fontChips .chip').forEach(chip=>{
   chip.addEventListener('click', ()=>{
