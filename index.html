@@ -15,6 +15,7 @@
     --grad: linear-gradient(120deg, #b7ecd4 0%, #a9d8ec 55%, #c9bdf0 100%);
     --grad-soft: linear-gradient(120deg, #e9fbf1 0%, #e6f4fb 55%, #f1ecfc 100%);
     --shadow: 0 16px 44px -20px rgba(76, 58, 128, 0.28);
+    --ok:#4fae8c; --grad-deep: linear-gradient(120deg, #6a5acd, #4c3a80);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -41,6 +42,7 @@
   .nav-row.row1{ padding-bottom:10px; margin-bottom:8px; border-bottom:1px dashed var(--line); }
   .nav-row.row2{ justify-content:flex-start; }
   .nav-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .tight-group{ display:flex; flex-wrap:wrap; gap:4px; align-items:center; }
   @media (max-width:760px){
     .topnav{ padding:10px 12px; }
     .brand{ font-size:13.5px; width:100%; margin-bottom:4px; }
@@ -87,7 +89,7 @@
   .seg-btn.active{ background: var(--grad); border-color: transparent; color:#1c3b33; }
   .path-target{ margin-top:12px; }
 
-  .save-btn{ width:100%; margin-top:4px; padding:14px; border:none; border-radius:15px; font-family:var(--font-main); font-size:14.5px; font-weight:800; color:#fff; background: linear-gradient(120deg, #6a5acd, #4c3a80); cursor:pointer; box-shadow: 0 12px 26px -10px rgba(76,58,128,.5); }
+  .save-btn{ width:100%; margin-top:4px; padding:14px; border:none; border-radius:15px; font-family:var(--font-main); font-size:14.5px; font-weight:800; color:#fff; background: var(--grad-deep); cursor:pointer; box-shadow: 0 12px 26px -10px rgba(76,58,128,.5); }
   .save-btn:disabled{ opacity:.5; cursor:not-allowed; }
   .summary{ margin-top:16px; font-size:12.5px; color:var(--ink-soft); background:#faf9ff; border:1px dashed var(--line); border-radius:14px; padding:14px 16px; line-height:2; display:none; }
   .summary.show{ display:block; }
@@ -108,6 +110,7 @@
   .gtable-head, .gtable-row{ display:grid; align-items:stretch; }
   #quranGtableHead, #quranGtable .gtable-row{ grid-template-columns: 90px 1.2fr 1.2fr 1.2fr 1.3fr 80px; }
   #planGtableHead, #planGtable .gtable-row{ grid-template-columns: 36px 92px 66px 1.6fr 1.2fr 1.2fr 90px; }
+  #tathbitGtableHead, #tathbitGtable .gtable-row{ grid-template-columns: 36px 92px 66px 2.2fr 1.3fr; }
   .gtable-head{ background:#f0edfa; font-weight:800; font-size:12px; border-bottom:2px solid #ddd6f3; }
   .gtable-head > div{ padding:12px 6px; text-align:center; display:flex; align-items:center; justify-content:center; border-left:1px solid #e3ddf5; }
   .gtable-head > div:last-child{ border-left:none; }
@@ -133,12 +136,12 @@
   .motivate-box{ background: var(--grad-soft); border:1px solid #dfeff0; border-radius:16px; padding:14px 18px; text-align:center; font-size:13.5px; font-weight:700; margin-bottom:18px; }
   .tracking-toolbar{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
   .progress-pill{ background:#faf9ff; border:1.5px solid var(--line); border-radius:13px; padding:9px 16px; font-size:13px; }
-  .progress-pill b{ color:#2f8f6e; font-size:14.5px; }
+  .progress-pill b{ color:var(--ok); font-size:14.5px; }
   tbody tr:hover{ background:#faf9ff; }
   .unit-cell{ font-weight:700; white-space:nowrap; }
   .note-input{ padding:7px; font-size:12px; }
   .ach-cell{ display:flex; align-items:center; justify-content:center; gap:6px; }
-  .done-check{ width:18px; height:18px; accent-color:#4fae8c; cursor:pointer; }
+  .done-check{ width:18px; height:18px; accent-color:var(--ok); cursor:pointer; }
   .gtable-row select{ font-size:11.5px; padding:7px 22px 7px 6px; }
   .icon-btn{ height:34px; display:inline-flex; align-items:center; justify-content:center; border:none; background:#faf9ff; border-radius:8px; padding:6px 8px; font-size:14px; cursor:pointer; flex-shrink:0; }
   .icon-btn:hover{ background:#efeaff; }
@@ -204,17 +207,17 @@
   .add-level-row input{ flex:1; padding:9px 12px; border-radius:11px; border:1.5px solid var(--line); background:#faf9ff; font-family:var(--font-main); font-size:12.5px; }
   .add-level-btn{ border:1.5px solid var(--line); background:#f4f2fb; border-radius:11px; padding:9px 14px; font-size:12.5px; font-weight:700; cursor:pointer; font-family:var(--font-main); white-space:nowrap; }
   .add-level-btn:hover{ border-color:#a9d8ec; }
-  .palette-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(120px,1fr)); gap:14px; }
+  .palette-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(110px,1fr)); gap:14px; }
   .palette-card{ border:2px solid transparent; border-radius:16px; padding:4px; cursor:pointer; transition:all .18s ease; box-shadow:0 4px 14px -6px rgba(35,32,66,.18); }
   .palette-card:hover{ transform:translateY(-2px); box-shadow:0 8px 18px -6px rgba(35,32,66,.28); }
   .palette-card.active{ border-color:var(--ink); }
-  .palette-preview{ height:56px; border-radius:12px; }
+  .palette-preview{ height:52px; border-radius:12px; }
   .toggle-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; font-size:13.5px; }
   .switch{ position:relative; width:42px; height:23px; }
   .switch input{ opacity:0; width:0; height:0; }
   .slider-tg{ position:absolute; inset:0; background:#ddd; border-radius:24px; cursor:pointer; transition:.2s; }
   .slider-tg:before{ content:""; position:absolute; height:17px; width:17px; left:3px; bottom:3px; background:white; border-radius:50%; transition:.2s; }
-  input:checked + .slider-tg{ background: linear-gradient(120deg,#4c3a80,#6a5acd); }
+  input:checked + .slider-tg{ background: var(--grad-deep); }
   input:checked + .slider-tg:before{ transform: translateX(-19px); }
   .danger-zone{ background:#fff2f0; border:1.5px solid #f3c9c3; border-radius:16px; padding:20px; }
   .danger-zone h3{ color:#b03a2e; }
@@ -251,14 +254,16 @@
 
 <nav class="topnav nav-hidden" id="topNav">
   <div class="nav-row row1">
-    <button class="brand" id="brandHome"><span class="ic">🏠</span> في رحاب القرآن الكريم</button>
-    <button class="pill active-pill" data-page="home">🏠 الرئيسية</button>
+    <div class="tight-group">
+      <button class="brand" id="brandHome"><span class="ic">🏠</span> في رحاب القرآن الكريم</button>
+      <button class="pill active-pill" data-page="home">🏠 الرئيسية</button>
+    </div>
     <button class="pill" data-page="stats">📊 الإحصائيات</button>
     <button class="pill" data-page="calendar">📅 التقويم</button>
     <button class="pill" data-page="achievements">🏆 الإنجازات</button>
     <button class="pill" data-page="settings">⚙️ الإعدادات</button>
   </div>
-  <div class="nav-row row2">
+  <div class="nav-row row2 tight-group">
     <div class="nav-group" id="planPills"></div>
     <button class="pill" id="navQuran">📋 متابعة حفظ القرآن</button>
     <button class="pill action" id="navNewPlan">➕ خطة جديدة</button>
@@ -316,6 +321,15 @@
           <div id="planTableBody"></div>
         </div>
       </div>
+      <div id="tathbitTableArea" style="display:none;">
+        <div class="plan-summary" id="tathbitTableSummary"></div>
+        <div class="gtable" id="tathbitGtable">
+          <div class="gtable-head" id="tathbitGtableHead">
+            <div>#</div><div>التاريخ</div><div>اليوم</div><div>المهام</div><div>ملاحظات</div>
+          </div>
+          <div id="tathbitTableBody"></div>
+        </div>
+      </div>
     </section>
   </div>
 
@@ -337,15 +351,6 @@
           <div class="stat-tile"><span class="em">📈</span><div class="val" id="spAvg">0%</div><div class="lbl">متوسط الإنجاز</div></div>
         </div>
         <div class="chart-block">
-          <h3>📈 الإنجاز اليومي وتطور النسبة</h3>
-          <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
-        </div>
-        <div class="chart-block">
-          <h3>📊 الإنجاز الأسبوعي</h3>
-          <div class="chart-wrap"><canvas id="weekChart"></canvas></div>
-          <p class="chart-caption" id="bestWeekCaption"></p>
-        </div>
-        <div class="chart-block">
           <h3>🧩 توزيع مستوى الإنجاز</h3>
           <div id="planDonutWrap" class="chart-wrap"><canvas id="donutChartPlan"></canvas></div>
           <div class="chart-empty" id="planDonutEmpty" style="display:none;">لا توجد بيانات كافية بعد</div>
@@ -362,15 +367,6 @@
           <div class="stat-tile"><span class="em">⏳</span><div class="val" id="sqJuzLeft">30</div><div class="lbl">الأجزاء المتبقية</div></div>
           <div class="stat-tile"><span class="em">⏳</span><div class="val" id="sqHizbLeft">60</div><div class="lbl">الأحزاب المتبقية</div></div>
           <div class="stat-tile"><span class="em">📈</span><div class="val" id="sqAvg">0%</div><div class="lbl">متوسط الإنجاز</div></div>
-        </div>
-        <div class="chart-block">
-          <h3>📈 الإنجاز وتطور النسبة</h3>
-          <div class="chart-wrap"><canvas id="lineChartQuran"></canvas></div>
-        </div>
-        <div class="chart-block">
-          <h3>📊 الإنجاز حسب الأجزاء</h3>
-          <div class="chart-wrap"><canvas id="weekChartQuran"></canvas></div>
-          <p class="chart-caption" id="bestJuzCaption"></p>
         </div>
         <div class="chart-block">
           <h3>🧩 توزيع مستوى الإنجاز</h3>
@@ -455,7 +451,7 @@
           </div>
         </div>
 
-        <div class="field">
+        <div class="field" id="dailyTargetField">
           <div class="field-label"><span class="em">🎯</span> الهدف اليومي</div>
           <div class="row2">
             <div><div class="hint">وحدة القياس</div><select id="settingsUnit"><option value="جزء">جزء</option><option value="حزب">حزب</option><option value="وجه">وجه</option></select></div>
@@ -463,7 +459,7 @@
           </div>
         </div>
 
-        <div class="field">
+        <div class="field" id="pathTargetField">
           <div class="field-label"><span class="em">🗺️</span> مسار البداية</div>
           <div class="segmented">
             <div class="seg-btn active" data-settings-dir="تصاعدي">تصاعدي</div>
@@ -500,6 +496,22 @@
             <div class="seg-btn" data-follow-settings="الحفظ">🧠 الحفظ</div>
             <div class="seg-btn" data-follow-settings="المراجعة">🔁 المراجعة</div>
             <div class="seg-btn" data-follow-settings="ضبط التجويد">⚙️ ضبط التجويد</div>
+            <div class="seg-btn" data-follow-settings="التثبيت">🔒 التثبيت</div>
+          </div>
+        </div>
+
+        <div class="field" id="tathbitOptions" style="display:none;">
+          <div class="field-label">📘 اختيار الجزء أو الأجزاء (النصاب)</div>
+          <p class="hint" style="margin-bottom:8px;">اختر جزءًا واحدًا أو أكثر لتثبيته.</p>
+          <div class="chip-row" id="tathbitJuzPicker"></div>
+          <div style="margin-top:16px;">
+            <div class="field-label" style="margin-bottom:8px;">🗓️ خطوات يوم الخميس (مخصّصة)</div>
+            <p class="hint" style="margin-bottom:10px;">يوم الخميس مفتوح لإضافة خطواتك الخاصة بالتفصيل.</p>
+            <div class="chip-row" id="thursdayStepsList"></div>
+            <div class="add-level-row" style="margin-top:10px;">
+              <input type="text" id="newThursdayStep" placeholder="أضف خطوة ليوم الخميس...">
+              <button class="add-level-btn" id="addThursdayStepBtn">➕ إضافة</button>
+            </div>
           </div>
         </div>
 
@@ -526,7 +538,7 @@
 
         <div class="settings-block">
           <h3>🎨 لوحة الألوان</h3>
-          <p class="desc">اختر مجموعة الألوان المفضلة لديك لمظهر الموقع.</p>
+          <p class="desc">اختر مجموعة الألوان المفضلة لمظهر الموقع.</p>
           <div class="palette-grid" id="paletteGrid"></div>
         </div>
 
@@ -586,6 +598,9 @@ const surahPageRanges = [[1,1],[2,49],[50,76],[77,106],[107,127],[128,150],[151,
 [603,603],[604,604],[604,604],[604,604]];
 const surahIndexesForPage = Array.from({length:604}, ()=>[]);
 surahPageRanges.forEach((rg,idx)=>{ for(let p=rg[0]; p<=rg[1]; p++){ surahIndexesForPage[p-1].push(idx); } });
+const pageAyahText = ["الفاتحة: ١–٧", "البقرة: ١–٥", "البقرة: ٦–١٦", "البقرة: ١٧–٢٤", "البقرة: ٢٥–٢٩", "البقرة: ٣٠–٣٧", "البقرة: ٣٨–٤٨", "البقرة: ٤٩–٥٧", "البقرة: ٥٨–٦١", "البقرة: ٦٢–٦٩", "البقرة: ٧٠–٧٦", "البقرة: ٧٧–٨٣", "البقرة: ٨٤–٨٨", "البقرة: ٨٩–٩٣", "البقرة: ٩٤–١٠١", "البقرة: ١٠٢–١٠٥", "البقرة: ١٠٦–١١٢", "البقرة: ١١٣–١١٩", "البقرة: ١٢٠–١٢٦", "البقرة: ١٢٧–١٣٤", "البقرة: ١٣٥–١٤١", "البقرة: ١٤٢–١٤٥", "البقرة: ١٤٦–١٥٣", "البقرة: ١٥٤–١٦٣", "البقرة: ١٦٤–١٦٩", "البقرة: ١٧٠–١٧٦", "البقرة: ١٧٧–١٨١", "البقرة: ١٨٢–١٨٦", "البقرة: ١٨٧–١٩٠", "البقرة: ١٩١–١٩٦", "البقرة: ١٩٧–٢٠٢", "البقرة: ٢٠٣–٢١٠", "البقرة: ٢١١–٢١٥", "البقرة: ٢١٦–٢١٩", "البقرة: ٢٢٠–٢٢٤", "البقرة: ٢٢٥–٢٣٠", "البقرة: ٢٣١–٢٣٣", "البقرة: ٢٣٤–٢٣٧", "البقرة: ٢٣٨–٢٤٥", "البقرة: ٢٤٦–٢٤٨", "البقرة: ٢٤٩–٢٥٢", "البقرة: ٢٥٣–٢٥٦", "البقرة: ٢٥٧–٢٥٩", "البقرة: ٢٦٠–٢٦٤", "البقرة: ٢٦٥–٢٦٩", "البقرة: ٢٧٠–٢٧٤", "البقرة: ٢٧٥–٢٨١", "البقرة: ٢٨٢", "البقرة: ٢٨٣–٢٨٦", "آل عمران: ١–٩", "آل عمران: ١٠–١٥", "آل عمران: ١٦–٢٢", "آل عمران: ٢٣–٢٩", "آل عمران: ٣٠–٣٧", "آل عمران: ٣٨–٤٥", "آل عمران: ٤٦–٥٢", "آل عمران: ٥٣–٦١", "آل عمران: ٦٢–٧٠", "آل عمران: ٧١–٧٧", "آل عمران: ٧٨–٨٣", "آل عمران: ٨٤–٩١", "آل عمران: ٩٢–١٠٠", "آل عمران: ١٠١–١٠٨", "آل عمران: ١٠٩–١١٥", "آل عمران: ١١٦–١٢١", "آل عمران: ١٢٢–١٣٢", "آل عمران: ١٣٣–١٤٠", "آل عمران: ١٤١–١٤٨", "آل عمران: ١٤٩–١٥٣", "آل عمران: ١٥٤–١٥٧", "آل عمران: ١٥٨–١٦٥", "آل عمران: ١٦٦–١٧٣", "آل عمران: ١٧٤–١٨٠", "آل عمران: ١٨١–١٨٦", "آل عمران: ١٨٧–١٩٤", "آل عمران: ١٩٥–٢٠٠", "النساء: ١–٦", "النساء: ٧–١١", "النساء: ١٢–١٤", "النساء: ١٥–١٩", "النساء: ٢٠–٢٣", "النساء: ٢٤–٢٦", "النساء: ٢٧–٣٣", "النساء: ٣٤–٣٧", "النساء: ٣٨–٤٤", "النساء: ٤٥–٥١", "النساء: ٥٢–٥٩", "النساء: ٦٠–٦٥", "النساء: ٦٦–٧٤", "النساء: ٧٥–٧٩", "النساء: ٨٠–٨٦", "النساء: ٨٧–٩١", "النساء: ٩٢–٩٤", "النساء: ٩٥–١٠١", "النساء: ١٠٢–١٠٥", "النساء: ١٠٦–١١٣", "النساء: ١١٤–١٢١", "النساء: ١٢٢–١٢٧", "النساء: ١٢٨–١٣٤", "النساء: ١٣٥–١٤٠", "النساء: ١٤١–١٤٧", "النساء: ١٤٨–١٥٤", "النساء: ١٥٥–١٦٢", "النساء: ١٦٣–١٧٠", "النساء: ١٧١–١٧٥", "النساء: ١٧٦، المائدة: ١–٢", "المائدة: ٣–٥", "المائدة: ٦–٩", "المائدة: ١٠–١٣", "المائدة: ١٤–١٧", "المائدة: ١٨–٢٣", "المائدة: ٢٤–٣١", "المائدة: ٣٢–٣٦", "المائدة: ٣٧–٤١", "المائدة: ٤٢–٤٥", "المائدة: ٤٦–٥٠", "المائدة: ٥١–٥٧", "المائدة: ٥٨–٦٤", "المائدة: ٦٥–٧٠", "المائدة: ٧١–٧٦", "المائدة: ٧٧–٨٢", "المائدة: ٨٣–٨٩", "المائدة: ٩٠–٩٥", "المائدة: ٩٦–١٠٣", "المائدة: ١٠٤–١٠٨", "المائدة: ١٠٩–١١٣", "المائدة: ١١٤–١٢٠", "الأنعام: ١–٨", "الأنعام: ٩–١٨", "الأنعام: ١٩–٢٧", "الأنعام: ٢٨–٣٥", "الأنعام: ٣٦–٤٤", "الأنعام: ٤٥–٥٢", "الأنعام: ٥٣–٥٩", "الأنعام: ٦٠–٦٨", "الأنعام: ٦٩–٧٣", "الأنعام: ٧٤–٨١", "الأنعام: ٨٢–٩٠", "الأنعام: ٩١–٩٤", "الأنعام: ٩٥–١٠١", "الأنعام: ١٠٢–١١٠", "الأنعام: ١١١–١١٨", "الأنعام: ١١٩–١٢٤", "الأنعام: ١٢٥–١٣١", "الأنعام: ١٣٢–١٣٧", "الأنعام: ١٣٨–١٤٢", "الأنعام: ١٤٣–١٤٦", "الأنعام: ١٤٧–١٥١", "الأنعام: ١٥٢–١٥٧", "الأنعام: ١٥٨–١٦٥", "الأعراف: ١–١١", "الأعراف: ١٢–٢٢", "الأعراف: ٢٣–٣٠", "الأعراف: ٣١–٣٧", "الأعراف: ٣٨–٤٣", "الأعراف: ٤٤–٥١", "الأعراف: ٥٢–٥٧", "الأعراف: ٥٨–٦٧", "الأعراف: ٦٨–٧٣", "الأعراف: ٧٤–٨١", "الأعراف: ٨٢–٨٧", "الأعراف: ٨٨–٩٥", "الأعراف: ٩٦–١٠٤", "الأعراف: ١٠٥–١٢٠", "الأعراف: ١٢١–١٣٠", "الأعراف: ١٣١–١٣٧", "الأعراف: ١٣٨–١٤٣", "الأعراف: ١٤٤–١٤٩", "الأعراف: ١٥٠–١٥٥", "الأعراف: ١٥٦–١٥٩", "الأعراف: ١٦٠–١٦٣", "الأعراف: ١٦٤–١٧٠", "الأعراف: ١٧١–١٧٨", "الأعراف: ١٧٩–١٨٧", "الأعراف: ١٨٨–١٩٥", "الأعراف: ١٩٦–٢٠٦", "الأنفال: ١–٨", "الأنفال: ٩–١٦", "الأنفال: ١٧–٢٥", "الأنفال: ٢٦–٣٣", "الأنفال: ٣٤–٤٠", "الأنفال: ٤١–٤٥", "الأنفال: ٤٦–٥٢", "الأنفال: ٥٣–٦١", "الأنفال: ٦٢–٦٩", "الأنفال: ٧٠–٧٥", "التوبة: ١–٦", "التوبة: ٧–١٣", "التوبة: ١٤–٢٠", "التوبة: ٢١–٢٦", "التوبة: ٢٧–٣١", "التوبة: ٣٢–٣٦", "التوبة: ٣٧–٤٠", "التوبة: ٤١–٤٧", "التوبة: ٤٨–٥٤", "التوبة: ٥٥–٦١", "التوبة: ٦٢–٦٨", "التوبة: ٦٩–٧٢", "التوبة: ٧٣–٧٩", "التوبة: ٨٠–٨٦", "التوبة: ٨٧–٩٣", "التوبة: ٩٤–٩٩", "التوبة: ١٠٠–١٠٦", "التوبة: ١٠٧–١١١", "التوبة: ١١٢–١١٧", "التوبة: ١١٨–١٢٢", "التوبة: ١٢٣–١٢٩", "يونس: ١–٦", "يونس: ٧–١٤", "يونس: ١٥–٢٠", "يونس: ٢١–٢٥", "يونس: ٢٦–٣٣", "يونس: ٣٤–٤٢", "يونس: ٤٣–٥٣", "يونس: ٥٤–٦١", "يونس: ٦٢–٧٠", "يونس: ٧١–٧٨", "يونس: ٧٩–٨٨", "يونس: ٨٩–٩٧", "يونس: ٩٨–١٠٦", "يونس: ١٠٧، هود: ١–٥", "هود: ٦–١٢", "هود: ١٣–١٩", "هود: ٢٠–٢٨", "هود: ٢٩–٣٧", "هود: ٣٨–٤٥", "هود: ٤٦–٥٣", "هود: ٥٤–٦٢", "هود: ٦٣–٧١", "هود: ٧٢–٨١", "هود: ٨٢–٨٨", "هود: ٨٩–٩٧", "هود: ٩٨–١٠٨", "هود: ١٠٩–١١٧", "هود: ١١٨–١٢٣، يوسف: ١–٤", "يوسف: ٥–١٤", "يوسف: ١٥–٢٢", "يوسف: ٢٣–٣٠", "يوسف: ٣١–٣٧", "يوسف: ٣٨–٤٣", "يوسف: ٤٤–٥٢", "يوسف: ٥٣–٦٣", "يوسف: ٦٤–٦٩", "يوسف: ٧٠–٧٨", "يوسف: ٧٩–٨٦", "يوسف: ٨٧–٩٥", "يوسف: ٩٦–١٠٣", "يوسف: ١٠٤–١١١", "الرعد: ١–٥", "الرعد: ٦–١٣", "الرعد: ١٤–١٨", "الرعد: ١٩–٢٨", "الرعد: ٢٩–٣٤", "الرعد: ٣٥–٤٢", "الرعد: ٤٣، إبراهيم: ١–٥", "إبراهيم: ٦–١٠", "إبراهيم: ١١–١٨", "إبراهيم: ١٩–٢٤", "إبراهيم: ٢٥–٣٣", "إبراهيم: ٣٤–٤٢", "إبراهيم: ٤٣–٥٢", "الحجر: ١–١٥", "الحجر: ١٦–٣١", "الحجر: ٣٢–٥١", "الحجر: ٥٢–٧٠", "الحجر: ٧١–٩٠", "الحجر: ٩١–٩٩، النحل: ١–٦", "النحل: ٧–١٤", "النحل: ١٥–٢٦", "النحل: ٢٧–٣٤", "النحل: ٣٥–٤٢", "النحل: ٤٣–٥٤", "النحل: ٥٥–٦٤", "النحل: ٦٥–٧٢", "النحل: ٧٣–٧٩", "النحل: ٨٠–٨٧", "النحل: ٨٨–٩٣", "النحل: ٩٤–١٠٢", "النحل: ١٠٣–١١٠", "النحل: ١١١–١١٨", "النحل: ١١٩–١٢٨", "الإسراء: ١–٧", "الإسراء: ٨–١٧", "الإسراء: ١٨–٢٧", "الإسراء: ٢٨–٣٨", "الإسراء: ٣٩–٤٩", "الإسراء: ٥٠–٥٨", "الإسراء: ٥٩–٦٦", "الإسراء: ٦٧–٧٥", "الإسراء: ٧٦–٨٦", "الإسراء: ٨٧–٩٦", "الإسراء: ٩٧–١٠٤", "الإسراء: ١٠٥، الكهف: ١–٤", "الكهف: ٥–١٥", "الكهف: ١٦–٢٠", "الكهف: ٢١–٢٧", "الكهف: ٢٨–٣٤", "الكهف: ٣٥–٤٥", "الكهف: ٤٦–٥٣", "الكهف: ٥٤–٦١", "الكهف: ٦٢–٧٤", "الكهف: ٧٥–٨٣", "الكهف: ٨٤–٩٧", "الكهف: ٩٨–١١٠", "مريم: ١–١١", "مريم: ١٢–٢٥", "مريم: ٢٦–٣٨", "مريم: ٣٩–٥١", "مريم: ٥٢–٦٤", "مريم: ٦٥–٧٦", "مريم: ٧٧–٩٥", "مريم: ٩٦، طه: ١–١٢", "طه: ١٣–٣٧", "طه: ٣٨–٥١", "طه: ٥٢–٦٤", "طه: ٦٥–٧٦", "طه: ٧٧–٨٧", "طه: ٨٨–٩٨", "طه: ٩٩–١١٣", "طه: ١١٤–١٢٥", "طه: ١٢٦–١٣٥", "الأنبياء: ١–١٠", "الأنبياء: ١١–٢٤", "الأنبياء: ٢٥–٣٥", "الأنبياء: ٣٦–٤٤", "الأنبياء: ٤٥–٥٧", "الأنبياء: ٥٨–٧٢", "الأنبياء: ٧٣–٨١", "الأنبياء: ٨٢–٩٠", "الأنبياء: ٩١–١٠١", "الأنبياء: ١٠٢–١١٢", "الحج: ١–٥", "الحج: ٦–١٥", "الحج: ١٦–٢٣", "الحج: ٢٤–٣٠", "الحج: ٣١–٣٨", "الحج: ٣٩–٤٦", "الحج: ٤٧–٥٥", "الحج: ٥٦–٦٤", "الحج: ٦٥–٧٢", "الحج: ٧٣–٧٨", "المؤمنون: ١–١٧", "المؤمنون: ١٨–٢٧", "المؤمنون: ٢٨–٤٢", "المؤمنون: ٤٣–٥٩", "المؤمنون: ٦٠–٧٤", "المؤمنون: ٧٥–٨٩", "المؤمنون: ٩٠–١٠٤", "المؤمنون: ١٠٥–١١٨", "النور: ١–١٠", "النور: ١١–٢٠", "النور: ٢١–٢٧", "النور: ٢٨–٣١", "النور: ٣٢–٣٦", "النور: ٣٧–٤٣", "النور: ٤٤–٥٣", "النور: ٥٤–٥٨", "النور: ٥٩–٦١", "النور: ٦٢، الفرقان: ١–٢", "الفرقان: ٣–١١", "الفرقان: ١٢–٢٠", "الفرقان: ٢١–٣٢", "الفرقان: ٣٣–٤٣", "الفرقان: ٤٤–٥٥", "الفرقان: ٥٦–٦٧", "الفرقان: ٦٨–٧٧", "الشعراء: ١–١٩", "الشعراء: ٢٠–٣٩", "الشعراء: ٤٠–٦٠", "الشعراء: ٦١–٨٣", "الشعراء: ٨٤–١١١", "الشعراء: ١١٢–١٣٦", "الشعراء: ١٣٧–١٥٩", "الشعراء: ١٦٠–١٨٣", "الشعراء: ١٨٤–٢٠٦", "الشعراء: ٢٠٧–٢٢٧", "النمل: ١–١٣", "النمل: ١٤–٢٢", "النمل: ٢٣–٣٥", "النمل: ٣٦–٤٤", "النمل: ٤٥–٥٥", "النمل: ٥٦–٦٣", "النمل: ٦٤–٧٦", "النمل: ٧٧–٨٨", "النمل: ٨٩، القصص: ١–٥", "القصص: ٦–١٣", "القصص: ١٤–٢١", "القصص: ٢٢–٢٨", "القصص: ٢٩–٣٥", "القصص: ٣٦–٤٣", "القصص: ٤٤–٥٠", "القصص: ٥١–٥٩", "القصص: ٦٠–٧٠", "القصص: ٧١–٧٧", "القصص: ٧٨–٨٤", "القصص: ٨٥، العنكبوت: ١–٦", "العنكبوت: ٧–١٤", "العنكبوت: ١٥–٢٣", "العنكبوت: ٢٤–٣٠", "العنكبوت: ٣١–٣٨", "العنكبوت: ٣٩–٤٥", "العنكبوت: ٤٦–٥٢", "العنكبوت: ٥٣–٦٣", "العنكبوت: ٦٤، الروم: ١–٥", "الروم: ٦–١٥", "الروم: ١٦–٢٤", "الروم: ٢٥–٣٢", "الروم: ٣٣–٤١", "الروم: ٤٢–٥٠", "الروم: ٥١–٦٠", "لقمان: ١–١١", "لقمان: ١٢–١٩", "لقمان: ٢٠–٢٨", "لقمان: ٢٩–٣٤", "السجدة: ١–١١", "السجدة: ١٢–٢٠", "السجدة: ٢١–٣٠", "الأحزاب: ١–٦", "الأحزاب: ٧–١٥", "الأحزاب: ١٦–٢٢", "الأحزاب: ٢٣–٣٠", "الأحزاب: ٣١–٣٥", "الأحزاب: ٣٦–٤٣", "الأحزاب: ٤٤–٥٠", "الأحزاب: ٥١–٥٤", "الأحزاب: ٥٥–٦٢", "الأحزاب: ٦٣–٧٣", "سبأ: ١–٧", "سبأ: ٨–١٤", "سبأ: ١٥–٢٢", "سبأ: ٢٣–٣١", "سبأ: ٣٢–٣٩", "سبأ: ٤٠–٤٨", "سبأ: ٤٩–٥٤، فاطر: ١–٣", "فاطر: ٤–١١", "فاطر: ١٢–١٨", "فاطر: ١٩–٣٠", "فاطر: ٣١–٣٨", "فاطر: ٣٩–٤٤", "فاطر: ٤٥، يس: ١–١٢", "يس: ١٣–٢٧", "يس: ٢٨–٤٠", "يس: ٤١–٥٤", "يس: ٥٥–٧٠", "يس: ٧١–٨٣", "الصافات: ١–٢٤", "الصافات: ٢٥–٥١", "الصافات: ٥٢–٧٦", "الصافات: ٧٧–١٠٢", "الصافات: ١٠٣–١٢٦", "الصافات: ١٢٧–١٥٣", "الصافات: ١٥٤–١٨٢", "ص: ١–١٦", "ص: ١٧–٢٦", "ص: ٢٧–٤٢", "ص: ٤٣–٦١", "ص: ٦٢–٨٣", "ص: ٨٤–٨٨، الزمر: ١–٥", "الزمر: ٦–١٠", "الزمر: ١١–٢١", "الزمر: ٢٢–٣١", "الزمر: ٣٢–٤٠", "الزمر: ٤١–٤٧", "الزمر: ٤٨–٥٦", "الزمر: ٥٧–٦٧", "الزمر: ٦٨–٧٤", "الزمر: ٧٥، غافر: ١–٧", "غافر: ٨–١٦", "غافر: ١٧–٢٥", "غافر: ٢٦–٣٣", "غافر: ٣٤–٤٠", "غافر: ٤١–٤٩", "غافر: ٥٠–٥٨", "غافر: ٥٩–٦٦", "غافر: ٦٧–٧٧", "غافر: ٧٨–٨٥", "فصلت: ١–١١", "فصلت: ١٢–٢٠", "فصلت: ٢١–٢٩", "فصلت: ٣٠–٣٨", "فصلت: ٣٩–٤٦", "فصلت: ٤٧–٥٤", "الشورى: ١–١٠", "الشورى: ١١–١٥", "الشورى: ١٦–٢٢", "الشورى: ٢٣–٣١", "الشورى: ٣٢–٤٤", "الشورى: ٤٥–٥١", "الشورى: ٥٢–٥٣، الزخرف: ١–١٠", "الزخرف: ١١–٢٢", "الزخرف: ٢٣–٣٣", "الزخرف: ٣٤–٤٧", "الزخرف: ٤٨–٦٠", "الزخرف: ٦١–٧٣", "الزخرف: ٧٤–٨٩", "الدخان: ١–١٨", "الدخان: ١٩–٣٩", "الدخان: ٤٠–٥٩", "الجاثية: ١–١٣", "الجاثية: ١٤–٢٢", "الجاثية: ٢٣–٣٢", "الجاثية: ٣٣–٣٧، الأحقاف: ١–٥", "الأحقاف: ٦–١٤", "الأحقاف: ١٥–٢٠", "الأحقاف: ٢١–٢٨", "الأحقاف: ٢٩–٣٥", "محمد: ١–١١", "محمد: ١٢–١٩", "محمد: ٢٠–٢٩", "محمد: ٣٠–٣٨", "الفتح: ١–٩", "الفتح: ١٠–١٥", "الفتح: ١٦–٢٣", "الفتح: ٢٤–٢٨", "الفتح: ٢٩، الحجرات: ١–٤", "الحجرات: ٥–١١", "الحجرات: ١٢–١٨", "ق: ١–١٥", "ق: ١٦–٣٥", "ق: ٣٦–٤٥، الذاريات: ١–٦", "الذاريات: ٧–٣٠", "الذاريات: ٣١–٥١", "الذاريات: ٥٢–٦٠، الطور: ١–١٤", "الطور: ١٥–٣١", "الطور: ٣٢–٤٩", "النجم: ١–٢٦", "النجم: ٢٧–٤٤", "النجم: ٤٥–٦٢، القمر: ١–٦", "القمر: ٧–٢٧", "القمر: ٢٨–٤٩", "القمر: ٥٠–٥٥، الرحمن: ١–١٦", "الرحمن: ١٧–٤٠", "الرحمن: ٤١–٦٧", "الرحمن: ٦٨–٧٨، الواقعة: ١–١٦", "الواقعة: ١٧–٥٠", "الواقعة: ٥١–٧٦", "الواقعة: ٧٧–٩٦، الحديد: ١–٣", "الحديد: ٤–١١", "الحديد: ١٢–١٨", "الحديد: ١٩–٢٤", "الحديد: ٢٥–٢٩", "المجادلة: ١–٦", "المجادلة: ٧–١١", "المجادلة: ١٢–٢١", "المجادلة: ٢٢، الحشر: ١–٣", "الحشر: ٤–٩", "الحشر: ١٠–١٦", "الحشر: ١٧–٢٤", "الممتحنة: ١–٥", "الممتحنة: ٦–١١", "الممتحنة: ١٢، الصف: ١–٥", "الصف: ٦–١٤", "الجمعة: ١–٨", "الجمعة: ٩–١١، المنافقون: ١–٤", "المنافقون: ٥–١١", "التغابن: ١–٩", "التغابن: ١٠–١٨", "الطلاق: ١–٥", "الطلاق: ٦–١٢", "التحريم: ١–٧", "التحريم: ٨–١٢", "الملك: ١–١٢", "الملك: ١٣–٢٦", "الملك: ٢٧–٣٠، القلم: ١–١٥", "القلم: ١٦–٤٢", "القلم: ٤٣–٥٢، الحاقة: ١–٨", "الحاقة: ٩–٣٤", "الحاقة: ٣٥–٥٢، المعارج: ١–١٠", "المعارج: ١١–٣٩", "المعارج: ٤٠–٤٤، نوح: ١–١٠", "نوح: ١١–٢٨", "الجن: ١–١٣", "الجن: ١٤–٢٨", "المزمل: ١–١٩", "المزمل: ٢٠، المدثر: ١–١٧", "المدثر: ١٨–٤٧", "المدثر: ٤٨–٥٦، القيامة: ١–١٩", "القيامة: ٢٠–٤٠، الإنسان: ١–٥", "الإنسان: ٦–٢٥", "الإنسان: ٢٦–٣١، المرسلات: ١–١٩", "المرسلات: ٢٠–٥٠", "النبأ: ١–٣٠", "النبأ: ٣١–٤٠، النازعات: ١–١٥", "النازعات: ١٦–٤٦", "عبس: ١–٤٢", "التكوير: ١–٢٩", "الانفطار: ١–١٩، المطففين: ١–٦", "المطففين: ٧–٣٤", "المطففين: ٣٥–٣٦، الانشقاق: ١–٢٥", "البروج: ١–٢٢", "الطارق: ١–١٧، الأعلى: ١–١٥", "الأعلى: ١٦–١٩، الغاشية: ١–٢٦", "الفجر: ١–٢٣", "الفجر: ٢٤–٣٠، البلد: ١–٢٠", "الشمس: ١–١٥، الليل: ١–١٤", "الليل: ١٥–٢١، الضحى: ١–١١، الشرح: ١–٨", "التين: ١–٨، العلق: ١–١٩", "القدر: ١–٥، البينة: ١–٧", "البينة: ٨، الزلزلة: ١–٨، العاديات: ١–٩", "العاديات: ١٠–١١، القارعة: ١–١١، التكاثر: ١–٨", "العصر: ١–٣، الهمزة: ١–٩، الفيل: ١–٥", "قريش: ١–٤، الماعون: ١–٧، الكوثر: ١–٣", "الكافرون: ١–٦، النصر: ١–٣، المسد: ١–٥", "الإخلاص: ١–٤، الفلق: ١–٥، الناس: ١–٦"];
+function pageAyahLabel(pageNum){ return pageAyahText[pageNum-1] || ''; }
+
 function syncSurahToPages(surahIdx, checked){
   const pageStore = getStore('quran','page'), surahStore = getStore('quran','surah');
   const [s,e] = surahPageRanges[surahIdx];
@@ -697,7 +712,7 @@ let trackMode = 'page';
 let trackDir = 'asc';
 const trackingStore = {};
 const planSchedules = {};
-let chartLine=null, chartWeek=null, chartDonutPlan=null, chartLineQuran=null, chartWeekQuran=null, chartDonutQuran=null;
+let chartDonutPlan=null, chartDonutQuran=null;
 
 function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function getPlan(ctx){ const id = ctx.replace('plan:',''); return plans.find(p=>p.id===id); }
@@ -731,10 +746,13 @@ function renderHome(){
   document.getElementById('homeTracking').style.display = showTracking ? 'block' : 'none';
   if(!showTracking) return;
   const isQuran = activeContext === 'quran';
+  const plan = isQuran ? null : getPlan(activeContext);
+  const isTathbit = plan && plan.followType === 'التثبيت';
   document.getElementById('quranTableArea').style.display = isQuran ? 'block' : 'none';
-  document.getElementById('planTableArea').style.display = isQuran ? 'none' : 'block';
+  document.getElementById('planTableArea').style.display = (!isQuran && !isTathbit) ? 'block' : 'none';
+  document.getElementById('tathbitTableArea').style.display = (!isQuran && isTathbit) ? 'block' : 'none';
   document.getElementById('editPlanToolbar').style.display = isQuran ? 'none' : 'flex';
-  if(isQuran) buildQuranTable(); else buildPlanTable(getPlan(activeContext));
+  if(isQuran) buildQuranTable(); else buildPlanTable(plan);
 }
 document.getElementById('editPlanBtn').addEventListener('click', ()=>{
   creatingNewPlan = false;
@@ -801,7 +819,15 @@ function applySettingsDirDefault(){
 }
 applySettingsDirDefault();
 document.querySelectorAll('[data-follow-settings]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{ document.querySelectorAll('[data-follow-settings]').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); });
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-follow-settings]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const isTathbit = btn.dataset.followSettings === 'التثبيت';
+    document.getElementById('tathbitOptions').style.display = isTathbit ? 'block' : 'none';
+    document.getElementById('dailyTargetField').style.display = isTathbit ? 'none' : 'block';
+    document.getElementById('pathTargetField').style.display = isTathbit ? 'none' : 'block';
+    if(isTathbit) renderTathbitJuzPicker();
+  });
 });
 document.querySelectorAll('#weekdayPicker .chip').forEach(chip=>{
   chip.addEventListener('click', ()=>{
@@ -815,6 +841,46 @@ function getSelectedWeekdays(){
 function setSelectedWeekdays(days){
   document.querySelectorAll('#weekdayPicker .chip').forEach(c=> c.classList.toggle('active', days.includes(parseInt(c.dataset.day))));
 }
+
+/* ---- Tathbit (consolidation) follow-type ---- */
+const TATHBIT_BASE_TASKS = ["السماع مرة واحدة","التكرار الذاتي (٤ مرات)","التسجيل الذاتي (بدون خطأ مرة واحدة)","السرد على الرفيقة (مرتين بدون خطأ)"];
+const TATHBIT_CUMULATIVE_TASK = "السرد التراكمي (مرة واحدة ذاتية)";
+function tathbitTasksForWeekday(dow){
+  if(dow===0) return [...TATHBIT_BASE_TASKS]; // Sunday
+  if(dow===1 || dow===2 || dow===3) return [...TATHBIT_BASE_TASKS, TATHBIT_CUMULATIVE_TASK]; // Mon-Wed
+  return null; // Thursday handled separately, Fri/Sat are rest
+}
+let settingsThursdaySteps = [];
+let settingsTathbitJuz = [];
+function renderTathbitJuzPicker(){
+  document.getElementById('tathbitJuzPicker').innerHTML = Array.from({length:30},(_,i)=>i+1).map(n=>
+    `<div class="chip selectable ${settingsTathbitJuz.includes(n)?'active':''}" data-juz="${n}">الجزء ${n}</div>`
+  ).join('');
+  document.querySelectorAll('#tathbitJuzPicker .chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const n = parseInt(chip.dataset.juz);
+      if(settingsTathbitJuz.includes(n)) settingsTathbitJuz = settingsTathbitJuz.filter(x=>x!==n);
+      else settingsTathbitJuz.push(n);
+      chip.classList.toggle('active');
+    });
+  });
+}
+function renderThursdaySteps(){
+  document.getElementById('thursdayStepsList').innerHTML = settingsThursdaySteps.map((s,i)=>
+    `<div class="chip">${escapeHtml(s)} <span class="chip-remove" data-idx="${i}" style="cursor:pointer; margin-right:4px; opacity:.6;">✕</span></div>`
+  ).join('') || '<span class="hint">لم تُضف خطوات بعد لهذا اليوم.</span>';
+  document.querySelectorAll('.chip-remove').forEach(x=>{
+    x.addEventListener('click', ()=>{ settingsThursdaySteps.splice(parseInt(x.dataset.idx),1); renderThursdaySteps(); });
+  });
+}
+document.getElementById('addThursdayStepBtn').addEventListener('click', ()=>{
+  const inp = document.getElementById('newThursdayStep');
+  const val = inp.value.trim();
+  if(!val) return;
+  settingsThursdaySteps.push(val);
+  inp.value = '';
+  renderThursdaySteps();
+});
 
 function resetJourneyForm(){
   document.getElementById('journeyFormError').style.display = 'none';
@@ -830,6 +896,12 @@ function resetJourneyForm(){
   settingsDirection='تصاعدي'; settingsTargetMode='جزء';
   sJuzEl.style.display='block'; sSurahEl.style.display='none';
   setSelectedWeekdays([0,1,2,3,4,5,6]);
+  document.getElementById('tathbitOptions').style.display = 'none';
+  document.getElementById('dailyTargetField').style.display = 'block';
+  document.getElementById('pathTargetField').style.display = 'block';
+  settingsThursdaySteps = [];
+  settingsTathbitJuz = [];
+  renderThursdaySteps();
   applySettingsDirDefault();
 }
 let settingsMinimal = false;
@@ -864,6 +936,16 @@ function loadSettingsForContext(){
     sJuzEl.style.display = settingsTargetMode==='جزء'?'block':'none';
     sSurahEl.style.display = settingsTargetMode==='سورة'?'block':'none';
     if(settingsTargetMode==='جزء') sJuzEl.value = plan.rawTarget; else sSurahEl.value = plan.rawTarget;
+    const isTathbit = plan.followType === 'التثبيت';
+    document.getElementById('tathbitOptions').style.display = isTathbit ? 'block' : 'none';
+    document.getElementById('dailyTargetField').style.display = isTathbit ? 'none' : 'block';
+    document.getElementById('pathTargetField').style.display = isTathbit ? 'none' : 'block';
+    if(isTathbit){
+      settingsTathbitJuz = (plan.tathbitJuz || []).slice();
+      renderTathbitJuzPicker();
+      settingsThursdaySteps = (plan.thursdaySteps || []).slice();
+      renderThursdaySteps();
+    }
     saveBtn.textContent = '💾 حفظ إعدادات الرحلة';
     saveBtn.disabled = false;
   } else {
@@ -882,6 +964,9 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
   if(!startVal) missing.push('تاريخ البداية');
   if(!endVal) missing.push('تاريخ النهاية');
   if(startVal && endVal && new Date(endVal) < new Date(startVal)) missing.push('تاريخ نهاية صحيح (بعد تاريخ البداية)');
+  const followBtnCheck = document.querySelector('[data-follow-settings].active');
+  const isTathbitCheck = followBtnCheck && followBtnCheck.dataset.followSettings === 'التثبيت';
+  if(isTathbitCheck && settingsTathbitJuz.length===0) missing.push('اختيار جزء واحد على الأقل للتثبيت');
   if(missing.length){
     errEl.textContent = '⚠️ الرجاء إكمال الحقول التالية: ' + missing.join('، ');
     errEl.style.display = 'block';
@@ -891,6 +976,10 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
   const targetDisplay = settingsTargetMode==='جزء' ? ('الجزء '+rawTarget) : rawTarget;
   const followBtn = document.querySelector('[data-follow-settings].active');
   const activeDays = getSelectedWeekdays();
+  const chosenFollowType = followBtn ? followBtn.dataset.followSettings : 'لم يُحدَّد';
+  const isTathbit = chosenFollowType === 'التثبيت';
+  const thursdaySteps = isTathbit ? settingsThursdaySteps.slice() : [];
+  const tathbitJuz = isTathbit ? settingsTathbitJuz.slice().sort((a,b)=>a-b) : [];
 
   if(creatingNewPlan){
     const id = 'p' + (++planIdCounter);
@@ -900,9 +989,13 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
       endG: endVal,
       unit: document.getElementById('settingsUnit').value,
       qty: document.getElementById('settingsQuantity').value,
-      direction: settingsDirection, targetMode: settingsTargetMode, rawTarget, target: targetDisplay,
+      direction: settingsDirection,
+      targetMode: settingsTargetMode,
+      rawTarget: rawTarget,
+      target: isTathbit ? ('الجزء ' + tathbitJuz.join('، ')) : targetDisplay,
       activeDays,
-      followType: followBtn ? followBtn.dataset.followSettings : 'لم يُحدَّد'
+      followType: chosenFollowType,
+      tathbitJuz, thursdaySteps
     };
     plans.push(plan);
     addPlanPill(plan);
@@ -919,8 +1012,11 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
     plan.unit = document.getElementById('settingsUnit').value;
     plan.qty = document.getElementById('settingsQuantity').value;
     plan.activeDays = activeDays;
-    plan.direction = settingsDirection; plan.targetMode = settingsTargetMode; plan.rawTarget = rawTarget; plan.target = targetDisplay;
-    if(followBtn) plan.followType = followBtn.dataset.followSettings;
+    plan.direction = settingsDirection; plan.targetMode = settingsTargetMode; plan.rawTarget = rawTarget;
+    plan.target = isTathbit ? ('الجزء ' + tathbitJuz.join('، ')) : targetDisplay;
+    plan.followType = chosenFollowType;
+    plan.tathbitJuz = tathbitJuz;
+    plan.thursdaySteps = thursdaySteps;
     buildPlanSchedule(plan);
     const pillBtn = document.querySelector(`.context-pill[data-context="plan:${plan.id}"]`);
     if(pillBtn) pillBtn.textContent = '📘 ' + plan.name;
@@ -986,6 +1082,7 @@ document.querySelectorAll('[data-trackdir]').forEach(btn=>{
 
 /* ================= PLAN DAY-SCHEDULE TABLE ================= */
 function buildPlanSchedule(plan){
+  if(plan.followType === 'التثبيت'){ buildTathbitSchedule(plan); return; }
   const start = plan.startG ? new Date(plan.startG+'T00:00:00') : new Date();
   const end = plan.endG ? new Date(plan.endG+'T00:00:00') : new Date(start.getTime()+29*86400000);
   const totalDays = Math.max(1, Math.round((end-start)/86400000)+1);
@@ -1012,16 +1109,10 @@ function buildPlanSchedule(plan){
       const segs = []; let remaining = pagesPerDay, idx = startIdx;
       while(remaining>0){ const take = Math.min(remaining, sequence.length-idx); segs.push(sequence.slice(idx, idx+take)); remaining -= take; idx = 0; }
       cursor += pagesPerDay;
-      const first = segs[0][0], last = segs[segs.length-1][segs[segs.length-1].length-1];
+      const flatPages = segs.flat();
       const pageLabel = segs.map(seg => seg.length===1 ? `صفحة ${seg[0]}` : `صفحة ${seg[0]}-${seg[seg.length-1]}`).join(' + ');
-      if(plan.unit === 'حزب'){
-        const h1 = pageToHizb(first), h2 = pageToHizb(last);
-        targetLabel = `الحزب ${h1}${h1!==h2?'-'+h2:''} (${pageLabel})`;
-      } else if(plan.unit === 'وجه'){
-        targetLabel = `${plan.qty} وجه (${pageLabel})`;
-      } else {
-        targetLabel = pageLabel;
-      }
+      const ayahLabel = flatPages.map(p => pageAyahLabel(p)).join('، ');
+      targetLabel = `${ayahLabel} (${pageLabel})`;
     } else {
       const startIdx = surahs.indexOf(plan.rawTarget);
       const perDay = Math.max(1, Math.round(parseFloat(plan.qty)));
@@ -1037,6 +1128,30 @@ function buildPlanSchedule(plan){
   }
   planSchedules[plan.id] = rows;
 }
+function buildTathbitSchedule(plan){
+  const start = plan.startG ? new Date(plan.startG+'T00:00:00') : new Date();
+  const end = plan.endG ? new Date(plan.endG+'T00:00:00') : new Date(start.getTime()+29*86400000);
+  const totalDays = Math.max(1, Math.round((end-start)/86400000)+1);
+  const dayNamesAr = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+  const prevRows = planSchedules[plan.id] || [];
+  const rows = [];
+  for(let i=0;i<totalDays;i++){
+    const d = new Date(start.getTime()+i*86400000);
+    const dow = d.getDay();
+    const prev = prevRows[i];
+    const dateStr = fmtDateInput(new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())));
+    const isRestDay = (dow===5 || dow===6);
+    const isThursday = (dow===4);
+    let taskLabels;
+    if(isThursday) taskLabels = (plan.thursdaySteps && plan.thursdaySteps.length) ? plan.thursdaySteps : ['أضف خطواتك الخاصة من الإعدادات'];
+    else if(isRestDay) taskLabels = [];
+    else taskLabels = tathbitTasksForWeekday(dow) || [];
+    const prevTasks = prev && prev.tasks ? prev.tasks : [];
+    const tasks = taskLabels.map((label,ti)=> ({ label, done: prevTasks[ti] && prevTasks[ti].label===label ? prevTasks[ti].done : false }));
+    rows.push({ date: dateStr, dayName: dayNamesAr[dow], isRestDay, isThursday, tasks, note: prev?prev.note:'' });
+  }
+  planSchedules[plan.id] = rows;
+}
 function planTypeIcon(followType){
   if(followType==='الحفظ') return '🧠';
   if(followType==='المراجعة') return '🔁';
@@ -1045,6 +1160,7 @@ function planTypeIcon(followType){
 }
 let planTableFilter = 'all';
 function buildPlanTable(plan){
+  if(plan.followType === 'التثبيت'){ buildTathbitTable(plan); return; }
   if(!planSchedules[plan.id]) buildPlanSchedule(plan);
   const rows = planSchedules[plan.id];
   const total = rows.length, completed = rows.filter(r=>r.done).length;
@@ -1081,6 +1197,69 @@ function buildPlanTable(plan){
   }));
   document.querySelectorAll('#planTableBody .trash-btn').forEach(btn=> btn.addEventListener('click', ()=>{
     const idx = btn.dataset.idx; rows[idx].done=false; rows[idx].note=''; rows[idx].hifz=0; buildPlanTable(plan);
+  }));
+}
+function tathbitRowDone(r){ return r.tasks && r.tasks.length>0 && r.tasks.every(t=>t.done); }
+function buildTathbitTable(plan){
+  if(!planSchedules[plan.id]) buildPlanSchedule(plan);
+  const rows = planSchedules[plan.id];
+  const total = rows.length, completed = rows.filter(tathbitRowDone).length;
+  document.getElementById('tathbitTableSummary').innerHTML =
+    `<span class="summary-chip filter-chip ${planTableFilter==='all'?'active':''}" data-filter="all">📊 الكل: ${total}</span>
+     <span class="summary-chip filter-chip ${planTableFilter==='remaining'?'active':''}" data-filter="remaining">⏳ المتبقي: ${total-completed}</span>
+     <span class="summary-chip filter-chip ${planTableFilter==='done'?'active':''}" data-filter="done">✅ المكتمل: ${completed}</span>
+     <span class="summary-chip">📅 الأيام: ${completed}/${total}</span>
+     <span class="summary-chip" style="gap:8px;">📘 النصاب:
+       <input type="text" id="tathbitNisabInline" value="${escapeHtml(plan.target||'')}" style="border:none; background:transparent; font-family:var(--font-main); font-size:12.5px; font-weight:700; color:var(--ink); width:160px; outline:none; border-bottom:1px dashed var(--line);">
+     </span>`;
+  document.querySelectorAll('#tathbitTableSummary .filter-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{ planTableFilter = chip.dataset.filter; buildTathbitTable(plan); });
+  });
+  document.getElementById('tathbitNisabInline').addEventListener('change', (e)=>{ plan.target = e.target.value; });
+  const visibleRows = rows.map((r,i)=>({r,i})).filter(({r})=> planTableFilter==='all' || (planTableFilter==='done'&&tathbitRowDone(r)) || (planTableFilter==='remaining'&&!tathbitRowDone(r)));
+  document.getElementById('tathbitTableBody').innerHTML = visibleRows.map(({r,i})=>{
+    const tasksHtml = r.isRestDay
+      ? '🌙 يوم راحة'
+      : r.tasks.map((t,ti)=>`<label style="display:flex; align-items:center; gap:6px; margin-bottom:4px; cursor:pointer;">
+          <input type="checkbox" class="tathbit-task" data-row="${i}" data-task="${ti}" ${t.done?'checked':''}> <span style="font-size:12px;">${escapeHtml(t.label)}</span>
+          ${r.isThursday ? `<span class="chip-remove" data-remove-step="${ti}" style="cursor:pointer; opacity:.5; font-size:11px;">✕</span>` : ''}
+        </label>`).join('') + (r.isThursday ? `
+        <div style="display:flex; gap:6px; margin-top:6px;">
+          <input type="text" class="thursday-inline-input" placeholder="أضف خطوة..." style="flex:1; padding:6px 8px; border-radius:8px; border:1.5px solid var(--line); font-size:11.5px; font-family:var(--font-main);">
+          <button class="icon-btn thursday-inline-add" title="إضافة">➕</button>
+        </div>` : '');
+    return `<div class="gtable-row ${r.isRestDay?'rest-row':''}" data-row-idx="${i}">
+      <div data-label="#">${i+1}</div>
+      <div data-label="التاريخ">${r.date}</div>
+      <div data-label="اليوم">${r.dayName}${r.isThursday?' 🗓️':''}</div>
+      <div data-label="المهام" style="flex-direction:column; align-items:flex-start; text-align:right;">${tasksHtml}</div>
+      <div data-label="ملاحظات"><input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="ملاحظة..."></div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('#tathbitTableBody .note-input').forEach(inp=> inp.addEventListener('input', ()=>{ rows[inp.dataset.idx].note = inp.value; }));
+  document.querySelectorAll('#tathbitTableBody .tathbit-task').forEach(cb=> cb.addEventListener('change', ()=>{
+    const r = rows[cb.dataset.row];
+    r.tasks[cb.dataset.task].done = cb.checked;
+    if(cb.checked && tathbitRowDone(r)) burstConfetti(cb);
+    buildTathbitTable(plan);
+  }));
+  document.querySelectorAll('#tathbitTableBody .chip-remove[data-remove-step]').forEach(x=> x.addEventListener('click', (e)=>{
+    const rowEl = e.target.closest('[data-row-idx]');
+    const taskIdx = parseInt(x.dataset.removeStep);
+    const stepLabel = rows[parseInt(rowEl.dataset.rowIdx)].tasks[taskIdx].label;
+    plan.thursdaySteps = (plan.thursdaySteps||[]).filter(s=>s!==stepLabel);
+    buildPlanSchedule(plan);
+    buildTathbitTable(plan);
+  }));
+  document.querySelectorAll('#tathbitTableBody .thursday-inline-add').forEach(btn=> btn.addEventListener('click', (e)=>{
+    const rowEl = e.target.closest('[data-row-idx]');
+    const input = rowEl.querySelector('.thursday-inline-input');
+    const val = input.value.trim();
+    if(!val) return;
+    plan.thursdaySteps = plan.thursdaySteps || [];
+    plan.thursdaySteps.push(val);
+    buildPlanSchedule(plan);
+    buildTathbitTable(plan);
   }));
 }
 function burstConfetti(el){
@@ -1141,48 +1320,6 @@ function refreshStats(){
       return `<div class="cal-cell ${done?'done':''}" title="${escapeHtml(title)}" style="aspect-ratio:auto; padding:8px 2px;"><span class="g">${n}</span></div>`;
     }).join('');
 
-    if(window.Chart){
-      let running=0; const lineData = pageStore.map(r=>{ if(r.done) running++; return Math.round(running/604*100); });
-      const sampleEvery = 20;
-      const sampledLabels = [], sampledData = [];
-      for(let i=0;i<pageStore.length;i+=sampleEvery){ sampledLabels.push(i+1); sampledData.push(lineData[i]); }
-      sampledLabels.push(604); sampledData.push(lineData[603]);
-      if(chartLineQuran) chartLineQuran.destroy();
-      chartLineQuran = new Chart(document.getElementById('lineChartQuran').getContext('2d'), {
-        type:'line',
-        data:{ labels: sampledLabels, datasets:[{ label:'نسبة الإنجاز', data:sampledData, borderColor:'#2f8f6e', backgroundColor:'rgba(79,174,140,.18)', fill:true, tension:.3, borderWidth:2.5, pointRadius:2, pointHoverRadius:5, pointBackgroundColor:'#2f8f6e' }] },
-        options:{
-          responsive:true, maintainAspectRatio:false,
-          interaction:{ mode:'index', intersect:false },
-          plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title: items=>'الصفحة '+items[0].label, label: ctx=>'الإنجاز: '+ctx.parsed.y+'%' } } },
-          scales:{
-            y:{ min:0, max:100, grid:{color:'#eee9fb'}, ticks:{callback:v=>v+'%', font:{size:11}} },
-            x:{ grid:{display:false}, title:{display:true, text:'الصفحة', font:{size:11}}, ticks:{maxTicksLimit:10, font:{size:10}} }
-          }
-        }
-      });
-
-      const juzLabels = juzRanges.map((rg,i)=>'ج'+(i+1));
-      const juzData = juzRanges.map(rg=>{ let done=0; for(let p=rg[0];p<=rg[1];p++){ if(pageStore[p-1].done) done++; } return Math.round(done/(rg[1]-rg[0]+1)*100); });
-      if(chartWeekQuran) chartWeekQuran.destroy();
-      chartWeekQuran = new Chart(document.getElementById('weekChartQuran').getContext('2d'), {
-        type:'bar',
-        data:{ labels: juzLabels, datasets:[{ label:'الإنجاز حسب الجزء', data:juzData, backgroundColor: juzData.map(v => `rgba(79,174,140,${(0.22 + 0.78*(v/100)).toFixed(2)})`), borderRadius:6, maxBarThickness:26 }] },
-        options:{
-          responsive:true, maintainAspectRatio:false,
-          plugins:{ legend:{display:false}, tooltip:{ callbacks:{ title: items=>'الجزء '+items[0].label.replace('ج',''), label: ctx=>'الإنجاز: '+ctx.parsed.y+'%' } } },
-          scales:{
-            y:{ min:0, max:100, grid:{color:'#eee9fb'}, ticks:{callback:v=>v+'%', font:{size:11}} },
-            x:{ grid:{display:false}, ticks:{font:{size:9.5}, maxRotation:0} }
-          }
-        }
-      });
-      let bestJuzIdx = 0;
-      juzData.forEach((v,i)=>{ if(v > juzData[bestJuzIdx]) bestJuzIdx = i; });
-      const bj = document.getElementById('bestJuzCaption');
-      bj.textContent = juzData[bestJuzIdx] > 0 ? `أفضل جزء: الجزء ${bestJuzIdx+1} (${juzData[bestJuzIdx]}%)` : '';
-    }
-
     const empty = pagesDone===0;
     document.getElementById('quranPieEmpty').style.display = empty ? 'block':'none';
     document.getElementById('quranPieWrap').style.display = empty ? 'none':'block';
@@ -1215,56 +1352,6 @@ function refreshStats(){
     document.getElementById('spAvg').textContent = pct+'%';
 
     const rows = planSchedules[plan.id] || [];
-    if(window.Chart){
-      let running=0; const lineData = rows.map(r=>{ if(r.done) running++; return rows.length?Math.round(running/rows.length*100):0; });
-      if(chartLine) chartLine.destroy();
-      chartLine = new Chart(document.getElementById('lineChart').getContext('2d'), {
-        type:'line',
-        data:{ labels: rows.map((r,i)=>i+1), datasets:[{
-          label:'نسبة الإنجاز', data:lineData,
-          borderColor:'#2f8f6e', backgroundColor:'rgba(79,174,140,.18)',
-          fill:true, tension:.3, borderWidth:2.5,
-          pointRadius:2, pointHoverRadius:5, pointBackgroundColor:'#2f8f6e'
-        }] },
-        options:{
-          responsive:true, maintainAspectRatio:false,
-          interaction:{ mode:'index', intersect:false },
-          plugins:{
-            legend:{ display:false },
-            tooltip:{ callbacks:{ title: items=>'اليوم '+items[0].label, label: ctx=>'الإنجاز: '+ctx.parsed.y+'%' } }
-          },
-          scales:{
-            y:{ min:0, max:100, grid:{color:'#eee9fb'}, ticks:{callback:v=>v+'%', font:{size:11}} },
-            x:{ grid:{display:false}, title:{display:true, text:'يوم الخطة', font:{size:11}}, ticks:{maxTicksLimit:10, font:{size:10}} }
-          }
-        }
-      });
-
-      const weeks = [];
-      for(let i=0;i<rows.length;i+=7){ weeks.push(rows.slice(i,i+7)); }
-      const weekLabels = weeks.map((w,i)=>'أسبوع '+(i+1));
-      const weekData = weeks.map(w=> w.length ? Math.round(w.filter(r=>r.done).length/w.length*100) : 0);
-      const weekDoneCounts = weeks.map(w=> w.filter(r=>r.done).length);
-      if(chartWeek) chartWeek.destroy();
-      chartWeek = new Chart(document.getElementById('weekChart').getContext('2d'), {
-        type:'bar',
-        data:{ labels: weekLabels, datasets:[{ label:'الإنجاز الأسبوعي', data:weekData,
-          backgroundColor: weekData.map(v => `rgba(79,174,140,${(0.22 + 0.78*(v/100)).toFixed(2)})`),
-          hoverBackgroundColor:'#8fc7e0', borderRadius:8, maxBarThickness:42 }] },
-        options:{
-          responsive:true, maintainAspectRatio:false,
-          plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>'الإنجاز: '+ctx.parsed.y+'%' } } },
-          scales:{
-            y:{ min:0, max:100, grid:{color:'#eee9fb'}, ticks:{callback:v=>v+'%', font:{size:11}} },
-            x:{ grid:{display:false}, ticks:{font:{size:10.5}} }
-          }
-        }
-      });
-      let bestWeekIdx = 0;
-      weekDoneCounts.forEach((c,i)=>{ if(c > weekDoneCounts[bestWeekIdx]) bestWeekIdx = i; });
-      const bw = document.getElementById('bestWeekCaption');
-      bw.textContent = weekDoneCounts[bestWeekIdx] > 0 ? `أفضل أسبوع: أسبوع ${bestWeekIdx+1} (${weekDoneCounts[bestWeekIdx]} أيام)` : '';
-    }
     const empty = st.doneDays===0;
     document.getElementById('planDonutEmpty').style.display = empty?'block':'none';
     document.getElementById('planDonutWrap').style.display = empty?'none':'block';
@@ -1370,33 +1457,41 @@ document.querySelectorAll('.add-level-btn').forEach(btn=>{
 });
 
 const colorPalettes = [
-  { colors:['#A8DADC','#A8B89F','#F7F3EA','#B8A9C9'], accent:'#6FA8AC' },
-  { colors:['#F4B6A6','#D8A7B1','#9A7B6A','#FAF3E7'], accent:'#C97F6C' },
-  { colors:['#5B8E9E','#B8A4C9','#A8AD87','#F5F0E6'], accent:'#3F6B79' },
-  { colors:['#D99AB5','#E8D58B','#9DBCC8','#B7A0C8'], accent:'#C46F94' },
-  { colors:['#466B5D','#8DBDB5','#C9826B','#E8DCC8'], accent:'#345347' }
+  { colors:['#b7ecd4','#a9d8ec','#c9bdf0'], accent:'#4fae8c' },  // original default
+  { colors:['#f6c6ac','#f2a488','#e8998d'], accent:'#d97b5f' },  // sunset coral
+  { colors:['#a0d8d3','#7ec4cf','#8fa8d8'], accent:'#3f8fa3' },  // ocean breeze
+  { colors:['#f1c4d7','#e7a9c9','#c9a0dc'], accent:'#b56a9c' },  // rose garden
+  { colors:['#c9e4ca','#a3c9a8','#86b49a'], accent:'#4f8a68' },  // sage forest
+  { colors:['#ffe0a3','#f6c667','#e8a33d'], accent:'#c98a1f' }   // golden amber
 ];
 function renderPalettes(){
   document.getElementById('paletteGrid').innerHTML = colorPalettes.map((p,i)=>`
-    <div class="palette-card" data-palette="${i}">
-      <div class="palette-preview" style="background:linear-gradient(120deg, ${p.colors[0]} 0%, ${p.colors[1]} 35%, ${p.colors[2]} 70%, ${p.colors[3]} 100%);"></div>
+    <div class="palette-card ${i===0?'active':''}" data-palette="${i}">
+      <div class="palette-preview" style="background:linear-gradient(120deg, ${p.colors[0]} 0%, ${p.colors[1]} 55%, ${p.colors[2]} 100%);"></div>
     </div>`).join('');
   document.querySelectorAll('.palette-card').forEach(card=>{
     card.addEventListener('click', ()=>{
       document.querySelectorAll('.palette-card').forEach(c=>c.classList.remove('active'));
       card.classList.add('active');
-      const p = colorPalettes[parseInt(card.dataset.palette)];
-      applyPalette(p);
+      applyPalette(colorPalettes[parseInt(card.dataset.palette)]);
     });
   });
 }
+function shadeColor(hex, percent){
+  const f = parseInt(hex.slice(1),16), t = percent<0 ? 0 : 255, p = Math.abs(percent);
+  const R = f>>16, G = (f>>8)&0x00FF, B = f&0x0000FF;
+  return "#" + (0x1000000 + (Math.round((t-R)*p)+R)*0x10000 + (Math.round((t-G)*p)+G)*0x100 + (Math.round((t-B)*p)+B)).toString(16).slice(1);
+}
 function applyPalette(p){
-  const [c1,c2,c3,c4] = p.colors;
-  document.documentElement.style.setProperty('--grad', `linear-gradient(120deg, ${c1} 0%, ${c2} 55%, ${c4} 100%)`);
-  document.documentElement.style.setProperty('--grad-soft', `linear-gradient(120deg, ${c1}33 0%, ${c2}33 55%, ${c4}55 100%)`);
+  const [c1,c2,c3] = p.colors;
+  document.documentElement.style.setProperty('--grad', `linear-gradient(120deg, ${c1} 0%, ${c2} 55%, ${c3} 100%)`);
+  document.documentElement.style.setProperty('--grad-soft', `linear-gradient(120deg, ${c1}55 0%, ${c2}55 55%, ${c3}55 100%)`);
   document.documentElement.style.setProperty('--ok', p.accent);
+  const deep = shadeColor(p.accent, -0.35);
+  document.documentElement.style.setProperty('--grad-deep', `linear-gradient(120deg, ${p.accent}, ${deep})`);
 }
 renderPalettes();
+applyPalette(colorPalettes[0]);
 
 document.querySelectorAll('#fontChips .chip').forEach(chip=>{
   chip.addEventListener('click', ()=>{
