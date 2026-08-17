@@ -12,11 +12,11 @@
     --font-main: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif;
     --ink:#232042; --ink-soft:#5b5678;
     --card:#ffffffcc; --card-solid:#ffffff; --line:#e7e3f5;
-    --grad: linear-gradient(120deg, #b7ecd4 0%, #a9d8ec 55%, #c9bdf0 100%);
-    --grad-soft: linear-gradient(120deg, #e9fbf1 0%, #e6f4fb 55%, #f1ecfc 100%);
+    --grad: linear-gradient(120deg, #d4f5e6 0%, #d3ecf7 55%, #e5deff 100%);
+    --grad-soft: linear-gradient(120deg, #eefaf3 0%, #edf6fb 55%, #f3effc 100%);
     --shadow: 0 16px 44px -20px rgba(76, 58, 128, 0.28);
     --ok:#4fae8c; --grad-deep: linear-gradient(120deg, #6a5acd, #4c3a80);
-    --bg-a:#d9cdf7; --bg-b:#aee0ee; --bg-c:#bdf0d9;
+    --bg-a:#e5deff; --bg-b:#d3ecf7; --bg-c:#d4f5e6;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -44,7 +44,9 @@
   .nav-row.row1{ padding-bottom:10px; margin-bottom:8px; border-bottom:1px dashed var(--line); }
   .nav-row.row2{ justify-content:flex-start; }
   .nav-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-  .tight-group{ display:flex; flex-wrap:wrap; gap:2px; align-items:center; }
+  .tight-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .nav-row.row2{ gap:0; }
+  .nav-row.row2 .nav-group{ gap:0; }
   @media (max-width:760px){
     .topnav{ padding:10px 12px; }
     .brand{ font-size:13.5px; width:100%; margin-bottom:4px; }
@@ -209,11 +211,11 @@
   .add-level-row input{ flex:1; padding:9px 12px; border-radius:11px; border:1.5px solid var(--line); background:#faf9ff; font-family:var(--font-main); font-size:12.5px; }
   .add-level-btn{ border:1.5px solid var(--line); background:#f4f2fb; border-radius:11px; padding:9px 14px; font-size:12.5px; font-weight:700; cursor:pointer; font-family:var(--font-main); white-space:nowrap; }
   .add-level-btn:hover{ border-color:#a9d8ec; }
-  .palette-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(110px,1fr)); gap:14px; }
-  .palette-card{ border:2px solid transparent; border-radius:16px; padding:4px; cursor:pointer; transition:all .18s ease; box-shadow:0 4px 14px -6px rgba(35,32,66,.18); }
+  .palette-grid{ display:flex; flex-wrap:wrap; gap:16px; }
+  .palette-card{ border:2px solid transparent; border-radius:50%; padding:4px; cursor:pointer; transition:all .18s ease; box-shadow:0 4px 14px -6px rgba(35,32,66,.18); width:64px; height:64px; box-sizing:border-box; }
   .palette-card:hover{ transform:translateY(-2px); box-shadow:0 8px 18px -6px rgba(35,32,66,.28); }
   .palette-card.active{ border-color:var(--ink); }
-  .palette-preview{ height:52px; border-radius:12px; }
+  .palette-preview{ width:100%; height:100%; border-radius:50%; }
   .toggle-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; font-size:13.5px; }
   .switch{ position:relative; width:42px; height:23px; }
   .switch input{ opacity:0; width:0; height:0; }
@@ -420,6 +422,9 @@
             <div><div class="field-label"><span class="em">📅</span> تاريخ البداية</div><input type="date" id="settingsStartDateG"></div>
             <div><div class="field-label"><span class="em">📅</span> تاريخ النهاية</div><input type="date" id="settingsEndDateG"></div>
           </div>
+          <div class="field-label" style="margin-top:12px;"><span class="em">🔢</span> أو حدّد عدد الأيام</div>
+          <input type="number" id="settingsDayCount" min="1" placeholder="مثال: 30" style="max-width:160px;">
+          <p class="hint" style="margin-top:6px;">يُحسب على أساس أيام الحفظ المختارة أدناه فقط (تُستثنى أيام الإجازة).</p>
           <div class="hijri-section">
             <div class="field-label"><span class="em">🌙</span> التاريخ الهجري</div>
             <div class="row2">
@@ -503,12 +508,6 @@
             <div class="seg-btn" data-follow-settings="ضبط التجويد">⚙️ ضبط التجويد</div>
             <div class="seg-btn" data-follow-settings="التثبيت">🔒 التثبيت</div>
           </div>
-        </div>
-
-        <div class="field" id="tathbitNisabField" style="display:none;">
-          <div class="field-label">📝 النصاب</div>
-          <p class="hint" style="margin-bottom:8px;">اكتب وصف النصاب المراد تثبيته (اختياري).</p>
-          <input type="text" id="tathbitNisabText" placeholder="مثال: الجزء الأول والثاني">
         </div>
 
         <button class="save-btn" id="settingsSaveBtn" type="button">💾 حفظ إعدادات الرحلة</button>
@@ -796,6 +795,47 @@ fillHijriSelects('settingsHijriDayEnd','settingsHijriYearEnd');
 wireDateSync('settingsStartDateG','settingsHijriDayStart','settingsHijriMonthStart','settingsHijriYearStart');
 wireDateSync('settingsEndDateG','settingsHijriDayEnd','settingsHijriMonthEnd','settingsHijriYearEnd');
 
+/* ---- day-count <-> end-date sync (accounts for rest days) ---- */
+let syncingDayCount = false;
+function countActiveDaysBetween(startDate, endDate, activeDays){
+  let count=0, cur = new Date(startDate);
+  while(cur <= endDate){ if(activeDays.includes(cur.getDay())) count++; cur = new Date(cur.getTime()+86400000); }
+  return count;
+}
+function dateAfterActiveDays(startDate, targetCount, activeDays){
+  let cur = new Date(startDate), counted = 0;
+  while(true){
+    if(activeDays.includes(cur.getDay())){ counted++; if(counted>=targetCount) return cur; }
+    cur = new Date(cur.getTime()+86400000);
+  }
+}
+function updateDayCountFromDates(){
+  if(syncingDayCount) return;
+  const s = document.getElementById('settingsStartDateG').value, e = document.getElementById('settingsEndDateG').value;
+  if(s && e){
+    const days = countActiveDaysBetween(new Date(s), new Date(e), getSelectedWeekdays());
+    syncingDayCount = true;
+    document.getElementById('settingsDayCount').value = days>0 ? days : '';
+    syncingDayCount = false;
+  }
+}
+function recalcEndDateFromCount(){
+  const s = document.getElementById('settingsStartDateG').value;
+  const dc = parseInt(document.getElementById('settingsDayCount').value);
+  if(s && dc>0){
+    syncingDayCount = true;
+    const endDate = dateAfterActiveDays(new Date(s), dc, getSelectedWeekdays());
+    document.getElementById('settingsEndDateG').value = fmtDateInput(endDate);
+    syncingDayCount = false;
+  }
+}
+document.getElementById('settingsStartDateG').addEventListener('change', ()=>{
+  const dc = document.getElementById('settingsDayCount').value;
+  if(dc) recalcEndDateFromCount(); else updateDayCountFromDates();
+});
+document.getElementById('settingsEndDateG').addEventListener('change', updateDayCountFromDates);
+document.getElementById('settingsDayCount').addEventListener('input', ()=>{ if(!syncingDayCount) recalcEndDateFromCount(); });
+
 /* ================= SETTINGS: journey form (create + edit) ================= */
 const sJuzFromEl = document.getElementById('settingsJuzFromSelect');
 const sJuzToEl = document.getElementById('settingsJuzToSelect');
@@ -830,13 +870,14 @@ document.querySelectorAll('[data-follow-settings]').forEach(btn=>{
     btn.classList.add('active');
     const isTathbit = btn.dataset.followSettings === 'التثبيت';
     document.getElementById('dailyTargetField').style.display = isTathbit ? 'none' : 'block';
-    document.getElementById('tathbitNisabField').style.display = isTathbit ? 'block' : 'none';
   });
 });
 document.querySelectorAll('#weekdayPicker .chip').forEach(chip=>{
   chip.addEventListener('click', ()=>{
     chip.classList.toggle('active');
     if(!document.querySelectorAll('#weekdayPicker .chip.active').length) chip.classList.add('active'); // never allow zero days
+    const dc = document.getElementById('settingsDayCount').value;
+    if(dc) recalcEndDateFromCount(); else updateDayCountFromDates();
   });
 });
 function getSelectedWeekdays(){
@@ -859,6 +900,7 @@ function resetJourneyForm(){
   document.getElementById('journeyFormError').style.display = 'none';
   document.getElementById('settingsPlanName').value='';
   document.getElementById('settingsStartDateG').value='';
+  document.getElementById('settingsDayCount').value='';
   document.getElementById('settingsEndDateG').value='';
   ['settingsHijriDayStart','settingsHijriMonthStart','settingsHijriYearStart','settingsHijriDayEnd','settingsHijriMonthEnd','settingsHijriYearEnd'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('settingsUnit').value='جزء';
@@ -872,8 +914,6 @@ function resetJourneyForm(){
   sSurahFromEl.value = 'الفاتحة'; sSurahToEl.value = 'الناس';
   setSelectedWeekdays([0,1,2,3,4,5,6]);
   document.getElementById('dailyTargetField').style.display = 'block';
-  document.getElementById('tathbitNisabField').style.display = 'none';
-  document.getElementById('tathbitNisabText').value = '';
 }
 let settingsMinimal = false;
 function openNewPlanForm(){
@@ -897,6 +937,7 @@ function loadSettingsForContext(){
     document.getElementById('settingsPlanName').value = plan.name;
     document.getElementById('settingsStartDateG').value = plan.startG || '';
     document.getElementById('settingsEndDateG').value = plan.endG || '';
+    updateDayCountFromDates();
     document.getElementById('settingsUnit').value = plan.unit;
     document.getElementById('settingsQuantity').value = plan.qty;
     setSelectedWeekdays(plan.activeDays || [0,1,2,3,4,5,6]);
@@ -911,8 +952,6 @@ function loadSettingsForContext(){
     else { sSurahFromEl.value = plan.rangeFrom; sSurahToEl.value = plan.rangeTo; }
     const isTathbit = plan.followType === 'التثبيت';
     document.getElementById('dailyTargetField').style.display = isTathbit ? 'none' : 'block';
-    document.getElementById('tathbitNisabField').style.display = isTathbit ? 'block' : 'none';
-    document.getElementById('tathbitNisabText').value = plan.nisabText || '';
     saveBtn.textContent = '💾 حفظ إعدادات الرحلة';
     saveBtn.disabled = false;
   } else {
@@ -945,7 +984,6 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
   const activeDays = getSelectedWeekdays();
   const chosenFollowType = followBtn ? followBtn.dataset.followSettings : 'لم يُحدَّد';
   const isTathbit = chosenFollowType === 'التثبيت';
-  const nisabText = isTathbit ? document.getElementById('tathbitNisabText').value.trim() : '';
 
   if(creatingNewPlan){
     const id = 'p' + (++planIdCounter);
@@ -957,10 +995,9 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
       qty: document.getElementById('settingsQuantity').value,
       targetMode: settingsTargetMode,
       rangeFrom, rangeTo,
-      target: nisabText || targetDisplay,
+      target: targetDisplay,
       activeDays,
-      followType: chosenFollowType,
-      nisabText
+      followType: chosenFollowType
     };
     plans.push(plan);
     addPlanPill(plan);
@@ -978,9 +1015,8 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
     plan.qty = document.getElementById('settingsQuantity').value;
     plan.activeDays = activeDays;
     plan.targetMode = settingsTargetMode; plan.rangeFrom = rangeFrom; plan.rangeTo = rangeTo;
-    plan.target = nisabText || targetDisplay;
+    plan.target = plan.target && isTathbit ? plan.target : targetDisplay;
     plan.followType = chosenFollowType;
-    plan.nisabText = nisabText;
     buildPlanSchedule(plan);
     const pillBtn = document.querySelector(`.context-pill[data-context="plan:${plan.id}"]`);
     if(pillBtn) pillBtn.textContent = '📘 ' + plan.name;
@@ -1110,11 +1146,15 @@ function buildTathbitSchedule(plan){
     const dow = d.getDay();
     const prev = prevRows[i];
     const dateStr = fmtDateInput(new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())));
-    const isRestDay = (dow===4 || dow===5 || dow===6);
-    let taskLabels = isRestDay ? [] : (tathbitTasksForWeekday(dow) || []);
+    const isRestDay = (dow===5 || dow===6);
+    const isThursday = (dow===4);
+    let taskLabels;
+    if(isThursday) taskLabels = (plan.thursdaySteps && plan.thursdaySteps.length) ? plan.thursdaySteps : [];
+    else if(isRestDay) taskLabels = [];
+    else taskLabels = tathbitTasksForWeekday(dow) || [];
     const prevTasks = prev && prev.tasks ? prev.tasks : [];
     const tasks = taskLabels.map((label,ti)=> ({ label, done: prevTasks[ti] && prevTasks[ti].label===label ? prevTasks[ti].done : false }));
-    rows.push({ date: dateStr, dayName: dayNamesAr[dow], isRestDay, tasks, note: prev?prev.note:'' });
+    rows.push({ date: dateStr, dayName: dayNamesAr[dow], isRestDay, isThursday, tasks, note: prev?prev.note:'', nisab: prev?(prev.nisab||''):'' });
   }
   planSchedules[plan.id] = rows;
 }
@@ -1169,39 +1209,70 @@ function tathbitRowDone(r){ return r.tasks && r.tasks.length>0 && r.tasks.every(
 function buildTathbitTable(plan){
   if(!planSchedules[plan.id]) buildPlanSchedule(plan);
   const rows = planSchedules[plan.id];
-  const total = rows.length, completed = rows.filter(tathbitRowDone).length;
+  const countedRows = rows.filter(r=>!r.isRestDay);
+  const total = countedRows.length, completed = countedRows.filter(tathbitRowDone).length;
   document.getElementById('tathbitTableSummary').innerHTML =
     `<span class="summary-chip filter-chip ${planTableFilter==='all'?'active':''}" data-filter="all">📊 الكل: ${total}</span>
      <span class="summary-chip filter-chip ${planTableFilter==='remaining'?'active':''}" data-filter="remaining">⏳ المتبقي: ${total-completed}</span>
      <span class="summary-chip filter-chip ${planTableFilter==='done'?'active':''}" data-filter="done">✅ المكتمل: ${completed}</span>
-     <span class="summary-chip">📅 الأيام: ${completed}/${total}</span>
-     <span class="summary-chip" style="gap:8px;">📘 النصاب:
-       <input type="text" id="tathbitNisabInline" value="${escapeHtml(plan.target||'')}" style="border:none; background:transparent; font-family:var(--font-main); font-size:12.5px; font-weight:700; color:var(--ink); width:160px; outline:none; border-bottom:1px dashed var(--line);">
-     </span>`;
+     <span class="summary-chip">📅 الأيام: ${completed}/${total}</span>`;
   document.querySelectorAll('#tathbitTableSummary .filter-chip').forEach(chip=>{
     chip.addEventListener('click', ()=>{ planTableFilter = chip.dataset.filter; buildTathbitTable(plan); });
   });
-  document.getElementById('tathbitNisabInline').addEventListener('change', (e)=>{ plan.target = e.target.value; });
-  const visibleRows = rows.map((r,i)=>({r,i})).filter(({r})=> planTableFilter==='all' || (planTableFilter==='done'&&tathbitRowDone(r)) || (planTableFilter==='remaining'&&!tathbitRowDone(r)));
+  const visibleRows = rows.map((r,i)=>({r,i})).filter(({r})=> r.isRestDay || planTableFilter==='all' || (planTableFilter==='done'&&tathbitRowDone(r)) || (planTableFilter==='remaining'&&!tathbitRowDone(r)));
   document.getElementById('tathbitTableBody').innerHTML = visibleRows.map(({r,i})=>{
-    const tasksHtml = r.isRestDay
-      ? '🌙 يوم راحة'
-      : r.tasks.map((t,ti)=>`<label style="display:flex; align-items:center; gap:6px; margin-bottom:4px; cursor:pointer;">
+    let tasksHtml;
+    if(r.isRestDay){
+      tasksHtml = '🌙 يوم راحة';
+    } else {
+      tasksHtml = `<div style="display:flex; gap:6px; align-items:center; margin-bottom:6px; width:100%;">
+        <span style="font-size:11px; flex-shrink:0;">📘 النصاب:</span>
+        <input type="text" class="nisab-inline-input" data-idx="${i}" value="${escapeHtml(r.nisab||'')}" placeholder="اكتب النصاب..." style="flex:1; padding:5px 8px; border-radius:8px; border:1.5px solid var(--line); font-size:11.5px; font-family:var(--font-main);">
+      </div>`;
+      tasksHtml += r.tasks.map((t,ti)=>`<label style="display:flex; align-items:center; gap:6px; margin-bottom:4px; cursor:pointer;">
           <input type="checkbox" class="tathbit-task" data-row="${i}" data-task="${ti}" ${t.done?'checked':''}> <span style="font-size:12px;">${escapeHtml(t.label)}</span>
+          ${r.isThursday ? `<span class="chip-remove" data-remove-step="${ti}" style="cursor:pointer; opacity:.5; font-size:11px;">✕</span>` : ''}
         </label>`).join('');
+      if(r.isThursday){
+        if(!r.tasks.length) tasksHtml += `<div class="hint" style="margin-bottom:6px;">لم تُضف مهام بعد لهذا اليوم.</div>`;
+        tasksHtml += `<div style="display:flex; gap:6px; margin-top:4px; width:100%;">
+          <input type="text" class="thursday-inline-input" placeholder="أضف مهمة..." style="flex:1; padding:6px 8px; border-radius:8px; border:1.5px solid var(--line); font-size:11.5px; font-family:var(--font-main);">
+          <button class="icon-btn thursday-inline-add" title="إضافة">➕</button>
+        </div>`;
+      }
+    }
     return `<div class="gtable-row ${r.isRestDay?'rest-row':''}" data-row-idx="${i}">
       <div data-label="#">${i+1}</div>
       <div data-label="التاريخ">${r.date}</div>
-      <div data-label="اليوم">${r.dayName}</div>
+      <div data-label="اليوم">${r.dayName}${r.isThursday?' 🗓️':''}</div>
       <div data-label="المهام" style="flex-direction:column; align-items:flex-start; text-align:right;">${tasksHtml}</div>
       <div data-label="ملاحظات"><input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="ملاحظة..."></div>
     </div>`;
   }).join('');
   document.querySelectorAll('#tathbitTableBody .note-input').forEach(inp=> inp.addEventListener('input', ()=>{ rows[inp.dataset.idx].note = inp.value; }));
+  document.querySelectorAll('#tathbitTableBody .nisab-inline-input').forEach(inp=> inp.addEventListener('input', ()=>{ rows[inp.dataset.idx].nisab = inp.value; }));
   document.querySelectorAll('#tathbitTableBody .tathbit-task').forEach(cb=> cb.addEventListener('change', ()=>{
     const r = rows[cb.dataset.row];
     r.tasks[cb.dataset.task].done = cb.checked;
     if(cb.checked && tathbitRowDone(r)) burstConfetti(cb);
+    buildTathbitTable(plan);
+  }));
+  document.querySelectorAll('#tathbitTableBody .chip-remove[data-remove-step]').forEach(x=> x.addEventListener('click', (e)=>{
+    const rowEl = e.target.closest('[data-row-idx]');
+    const taskIdx = parseInt(x.dataset.removeStep);
+    const stepLabel = rows[parseInt(rowEl.dataset.rowIdx)].tasks[taskIdx].label;
+    plan.thursdaySteps = (plan.thursdaySteps||[]).filter(s=>s!==stepLabel);
+    buildPlanSchedule(plan);
+    buildTathbitTable(plan);
+  }));
+  document.querySelectorAll('#tathbitTableBody .thursday-inline-add').forEach(btn=> btn.addEventListener('click', (e)=>{
+    const rowEl = e.target.closest('[data-row-idx]');
+    const input = rowEl.querySelector('.thursday-inline-input');
+    const val = input.value.trim();
+    if(!val) return;
+    plan.thursdaySteps = plan.thursdaySteps || [];
+    plan.thursdaySteps.push(val);
+    buildPlanSchedule(plan);
     buildTathbitTable(plan);
   }));
 }
@@ -1400,12 +1471,12 @@ document.querySelectorAll('.add-level-btn').forEach(btn=>{
 });
 
 const colorPalettes = [
-  { colors:['#b7ecd4','#a9d8ec','#c9bdf0'], accent:'#4fae8c' },  // original default
-  { colors:['#f6c6ac','#f2a488','#e8998d'], accent:'#d97b5f' },  // sunset coral
-  { colors:['#a0d8d3','#7ec4cf','#8fa8d8'], accent:'#3f8fa3' },  // ocean breeze
-  { colors:['#f1c4d7','#e7a9c9','#c9a0dc'], accent:'#b56a9c' },  // rose garden
-  { colors:['#c9e4ca','#a3c9a8','#86b49a'], accent:'#4f8a68' },  // sage forest
-  { colors:['#ffe0a3','#f6c667','#e8a33d'], accent:'#c98a1f' }   // golden amber
+  { colors:['#d4f5e6','#d3ecf7','#e5deff'], accent:'#6fc7a4' },  // original default, lightened
+  { colors:['#fbe2d3','#fbd4c8','#f6ddd8'], accent:'#e8a488' },  // sunset coral
+  { colors:['#d3ede9','#cfe8ec','#dbe6f5'], accent:'#7fb8c2' },  // ocean breeze
+  { colors:['#faddea','#f6e2ef','#e8dcf5'], accent:'#d698bf' },  // rose garden
+  { colors:['#e2f2e2','#d9ecda','#e6f0e0'], accent:'#8ec29e' },  // sage forest
+  { colors:['#fff2d6','#fbe8bd','#f7ddb0'], accent:'#e8bd6f' }   // golden amber
 ];
 function renderPalettes(){
   document.getElementById('paletteGrid').innerHTML = colorPalettes.map((p,i)=>`
