@@ -16,24 +16,26 @@
     --grad-soft: linear-gradient(120deg, #e9fbf1 0%, #e6f4fb 55%, #f1ecfc 100%);
     --shadow: 0 16px 44px -20px rgba(76, 58, 128, 0.28);
     --ok:#4fae8c; --grad-deep: linear-gradient(120deg, #6a5acd, #4c3a80);
+    --bg-a:#d9cdf7; --bg-b:#aee0ee; --bg-c:#bdf0d9;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
     min-height:100vh; font-family:var(--font-main); color:var(--ink);
     background:
-      radial-gradient(circle at 15% 10%, #d9cdf7 0%, transparent 45%),
-      radial-gradient(circle at 85% 0%, #aee0ee 0%, transparent 40%),
-      radial-gradient(circle at 50% 100%, #bdf0d9 0%, transparent 45%),
+      radial-gradient(circle at 15% 10%, var(--bg-a) 0%, transparent 45%),
+      radial-gradient(circle at 85% 0%, var(--bg-b) 0%, transparent 40%),
+      radial-gradient(circle at 50% 100%, var(--bg-c) 0%, transparent 45%),
       #eef1fb;
     background-attachment: fixed;
     padding-bottom: 70px;
     overflow-x:hidden;
+    transition: background .4s ease;
   }
   .glow{ position:fixed; border-radius:50%; filter:blur(70px); opacity:.5; z-index:0; pointer-events:none;}
-  .glow.a{width:420px;height:420px; top:-120px; left:-100px; background:#c9bdf0;}
-  .glow.b{width:380px;height:380px; bottom:-140px; right:-120px; background:#a9d8ec;}
-  .glow.c{width:300px;height:300px; top:40%; right:10%; background:#b7ecd4; opacity:.3;}
+  .glow.a{width:420px;height:420px; top:-120px; left:-100px; background:var(--bg-a);}
+  .glow.b{width:380px;height:380px; bottom:-140px; right:-120px; background:var(--bg-b);}
+  .glow.c{width:300px;height:300px; top:40%; right:10%; background:var(--bg-c); opacity:.3;}
 
   /* ---- TOP NAV ---- */
   .topnav{ position:sticky; top:0; z-index:50; background:#ffffffee; backdrop-filter:blur(14px); border-bottom:1px solid var(--line); padding:12px 20px; }
@@ -42,7 +44,7 @@
   .nav-row.row1{ padding-bottom:10px; margin-bottom:8px; border-bottom:1px dashed var(--line); }
   .nav-row.row2{ justify-content:flex-start; }
   .nav-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-  .tight-group{ display:flex; flex-wrap:wrap; gap:4px; align-items:center; }
+  .tight-group{ display:flex; flex-wrap:wrap; gap:2px; align-items:center; }
   @media (max-width:760px){
     .topnav{ padding:10px 12px; }
     .brand{ font-size:13.5px; width:100%; margin-bottom:4px; }
@@ -460,19 +462,22 @@
         </div>
 
         <div class="field" id="pathTargetField">
-          <div class="field-label"><span class="em">🗺️</span> مسار البداية</div>
-          <div class="segmented">
-            <div class="seg-btn active" data-settings-dir="تصاعدي">تصاعدي</div>
-            <div class="seg-btn" data-settings-dir="تنازلي">تنازلي</div>
+          <div class="field-label"><span class="em">🗺️</span> نطاق الحفظ</div>
+          <div class="segmented" style="margin-bottom:10px;">
+            <div class="seg-btn active" data-settings-mode="جزء">جزء</div>
+            <div class="seg-btn" data-settings-mode="سورة">سورة</div>
           </div>
-          <div class="path-target">
-            <div class="hint" style="margin-top:10px;">اختيار الجزء أو السورة</div>
-            <div class="segmented" style="margin-bottom:10px;">
-              <div class="seg-btn active" data-settings-mode="جزء">جزء</div>
-              <div class="seg-btn" data-settings-mode="سورة">سورة</div>
+          <div class="row2">
+            <div>
+              <div class="hint">من</div>
+              <select id="settingsJuzFromSelect"></select>
+              <select id="settingsSurahFromSelect" style="display:none;"></select>
             </div>
-            <select id="settingsJuzSelect"></select>
-            <select id="settingsSurahSelect" style="display:none;"></select>
+            <div>
+              <div class="hint">إلى</div>
+              <select id="settingsJuzToSelect"></select>
+              <select id="settingsSurahToSelect" style="display:none;"></select>
+            </div>
           </div>
         </div>
 
@@ -500,19 +505,10 @@
           </div>
         </div>
 
-        <div class="field" id="tathbitOptions" style="display:none;">
-          <div class="field-label">📘 اختيار الجزء أو الأجزاء (النصاب)</div>
-          <p class="hint" style="margin-bottom:8px;">اختر جزءًا واحدًا أو أكثر لتثبيته.</p>
-          <div class="chip-row" id="tathbitJuzPicker"></div>
-          <div style="margin-top:16px;">
-            <div class="field-label" style="margin-bottom:8px;">🗓️ خطوات يوم الخميس (مخصّصة)</div>
-            <p class="hint" style="margin-bottom:10px;">يوم الخميس مفتوح لإضافة خطواتك الخاصة بالتفصيل.</p>
-            <div class="chip-row" id="thursdayStepsList"></div>
-            <div class="add-level-row" style="margin-top:10px;">
-              <input type="text" id="newThursdayStep" placeholder="أضف خطوة ليوم الخميس...">
-              <button class="add-level-btn" id="addThursdayStepBtn">➕ إضافة</button>
-            </div>
-          </div>
+        <div class="field" id="tathbitNisabField" style="display:none;">
+          <div class="field-label">📝 النصاب</div>
+          <p class="hint" style="margin-bottom:8px;">اكتب وصف النصاب المراد تثبيته (اختياري).</p>
+          <input type="text" id="tathbitNisabText" placeholder="مثال: الجزء الأول والثاني">
         </div>
 
         <button class="save-btn" id="settingsSaveBtn" type="button">💾 حفظ إعدادات الرحلة</button>
@@ -684,7 +680,7 @@ const planAchievementsDef = [
   {em:"🎖", t:"ثلاثة أيام", d:"حفظ متتالي لمدة 3 أيام", test:p=>({done:Math.min(3,p.doneDays),total:3})},
   {em:"🏅", t:"أسبوع كامل", d:"أكمل 7 أيام", test:p=>({done:Math.min(7,p.doneDays),total:7})},
   {em:"🥇", t:"نصف الخطة", d:"أنجز نصف الأيام", test:p=>({done:Math.min(Math.ceil(p.totalDays/2),p.doneDays),total:Math.ceil(p.totalDays/2)})},
-  {em:"🎉", t:"ثلاثون يومًا متتاليًا", d:"حفظ متتالٍ لمدة 30 يومًا", test:p=>({done:Math.min(30,p.doneDays),total:30})},
+  {em:"🎉", t:"إتمام أيام الخطة", d:"حفظ متتالٍ لكل أيام الخطة", test:p=>({done:Math.min(p.totalDays,p.doneDays),total:p.totalDays})},
   {em:"📚", t:"أول جزء", d:"أنجز أول جزء", test:p=>({done:Math.min(1,p.juzDone),total:1})},
   {em:"📖", t:"أول حزب", d:"أنجز أول حزب", test:p=>({done:Math.min(1,p.hizbDone),total:1})},
   {em:"🎯", t:"الخطة مكتملة", d:"أكمل جميع الأيام", test:p=>({done:p.doneDays,total:p.totalDays})},
@@ -801,32 +797,40 @@ wireDateSync('settingsStartDateG','settingsHijriDayStart','settingsHijriMonthSta
 wireDateSync('settingsEndDateG','settingsHijriDayEnd','settingsHijriMonthEnd','settingsHijriYearEnd');
 
 /* ================= SETTINGS: journey form (create + edit) ================= */
-const sJuzEl = document.getElementById('settingsJuzSelect');
-for(let i=1;i<=30;i++){ const o=document.createElement('option'); o.value=i; o.textContent="الجزء "+i; sJuzEl.appendChild(o); }
-const sSurahEl = document.getElementById('settingsSurahSelect');
-surahs.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; sSurahEl.appendChild(o); });
-
-let settingsDirection = 'تصاعدي', settingsTargetMode = 'جزء';
-document.querySelectorAll('[data-settings-dir]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{ document.querySelectorAll('[data-settings-dir]').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); settingsDirection = btn.dataset.settingsDir; applySettingsDirDefault(); });
-});
-document.querySelectorAll('[data-settings-mode]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{ document.querySelectorAll('[data-settings-mode]').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); settingsTargetMode = btn.dataset.settingsMode; sJuzEl.style.display = settingsTargetMode==='جزء'?'block':'none'; sSurahEl.style.display = settingsTargetMode==='سورة'?'block':'none'; applySettingsDirDefault(); });
-});
-function applySettingsDirDefault(){
-  if(settingsTargetMode === 'سورة'){ sSurahEl.value = (settingsDirection === 'تنازلي') ? 'الفاتحة' : 'الناس'; }
-  else { sJuzEl.value = (settingsDirection === 'تنازلي') ? '1' : '30'; }
+const sJuzFromEl = document.getElementById('settingsJuzFromSelect');
+const sJuzToEl = document.getElementById('settingsJuzToSelect');
+for(let i=1;i<=30;i++){
+  const o1=document.createElement('option'); o1.value=i; o1.textContent="الجزء "+i; sJuzFromEl.appendChild(o1);
+  const o2=document.createElement('option'); o2.value=i; o2.textContent="الجزء "+i; sJuzToEl.appendChild(o2);
 }
-applySettingsDirDefault();
+const sSurahFromEl = document.getElementById('settingsSurahFromSelect');
+const sSurahToEl = document.getElementById('settingsSurahToSelect');
+surahs.forEach(s=>{
+  const o1=document.createElement('option'); o1.value=s; o1.textContent=s; sSurahFromEl.appendChild(o1);
+  const o2=document.createElement('option'); o2.value=s; o2.textContent=s; sSurahToEl.appendChild(o2);
+});
+sJuzFromEl.value = 1; sJuzToEl.value = 30;
+sSurahFromEl.value = 'الفاتحة'; sSurahToEl.value = 'الناس';
+
+let settingsTargetMode = 'جزء';
+document.querySelectorAll('[data-settings-mode]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-settings-mode]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    settingsTargetMode = btn.dataset.settingsMode;
+    sJuzFromEl.style.display = settingsTargetMode==='جزء'?'block':'none';
+    sJuzToEl.style.display = settingsTargetMode==='جزء'?'block':'none';
+    sSurahFromEl.style.display = settingsTargetMode==='سورة'?'block':'none';
+    sSurahToEl.style.display = settingsTargetMode==='سورة'?'block':'none';
+  });
+});
 document.querySelectorAll('[data-follow-settings]').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('[data-follow-settings]').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     const isTathbit = btn.dataset.followSettings === 'التثبيت';
-    document.getElementById('tathbitOptions').style.display = isTathbit ? 'block' : 'none';
     document.getElementById('dailyTargetField').style.display = isTathbit ? 'none' : 'block';
-    document.getElementById('pathTargetField').style.display = isTathbit ? 'none' : 'block';
-    if(isTathbit) renderTathbitJuzPicker();
+    document.getElementById('tathbitNisabField').style.display = isTathbit ? 'block' : 'none';
   });
 });
 document.querySelectorAll('#weekdayPicker .chip').forEach(chip=>{
@@ -848,39 +852,8 @@ const TATHBIT_CUMULATIVE_TASK = "السرد التراكمي (مرة واحدة 
 function tathbitTasksForWeekday(dow){
   if(dow===0) return [...TATHBIT_BASE_TASKS]; // Sunday
   if(dow===1 || dow===2 || dow===3) return [...TATHBIT_BASE_TASKS, TATHBIT_CUMULATIVE_TASK]; // Mon-Wed
-  return null; // Thursday handled separately, Fri/Sat are rest
+  return null; // Thu/Fri/Sat are rest
 }
-let settingsThursdaySteps = [];
-let settingsTathbitJuz = [];
-function renderTathbitJuzPicker(){
-  document.getElementById('tathbitJuzPicker').innerHTML = Array.from({length:30},(_,i)=>i+1).map(n=>
-    `<div class="chip selectable ${settingsTathbitJuz.includes(n)?'active':''}" data-juz="${n}">الجزء ${n}</div>`
-  ).join('');
-  document.querySelectorAll('#tathbitJuzPicker .chip').forEach(chip=>{
-    chip.addEventListener('click', ()=>{
-      const n = parseInt(chip.dataset.juz);
-      if(settingsTathbitJuz.includes(n)) settingsTathbitJuz = settingsTathbitJuz.filter(x=>x!==n);
-      else settingsTathbitJuz.push(n);
-      chip.classList.toggle('active');
-    });
-  });
-}
-function renderThursdaySteps(){
-  document.getElementById('thursdayStepsList').innerHTML = settingsThursdaySteps.map((s,i)=>
-    `<div class="chip">${escapeHtml(s)} <span class="chip-remove" data-idx="${i}" style="cursor:pointer; margin-right:4px; opacity:.6;">✕</span></div>`
-  ).join('') || '<span class="hint">لم تُضف خطوات بعد لهذا اليوم.</span>';
-  document.querySelectorAll('.chip-remove').forEach(x=>{
-    x.addEventListener('click', ()=>{ settingsThursdaySteps.splice(parseInt(x.dataset.idx),1); renderThursdaySteps(); });
-  });
-}
-document.getElementById('addThursdayStepBtn').addEventListener('click', ()=>{
-  const inp = document.getElementById('newThursdayStep');
-  const val = inp.value.trim();
-  if(!val) return;
-  settingsThursdaySteps.push(val);
-  inp.value = '';
-  renderThursdaySteps();
-});
 
 function resetJourneyForm(){
   document.getElementById('journeyFormError').style.display = 'none';
@@ -891,18 +864,16 @@ function resetJourneyForm(){
   document.getElementById('settingsUnit').value='جزء';
   document.getElementById('settingsQuantity').value='1';
   document.querySelectorAll('[data-follow-settings]').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('[data-settings-dir]').forEach(b=>b.classList.toggle('active', b.dataset.settingsDir==='تصاعدي'));
   document.querySelectorAll('[data-settings-mode]').forEach(b=>b.classList.toggle('active', b.dataset.settingsMode==='جزء'));
-  settingsDirection='تصاعدي'; settingsTargetMode='جزء';
-  sJuzEl.style.display='block'; sSurahEl.style.display='none';
+  settingsTargetMode='جزء';
+  sJuzFromEl.style.display='block'; sJuzToEl.style.display='block';
+  sSurahFromEl.style.display='none'; sSurahToEl.style.display='none';
+  sJuzFromEl.value = 1; sJuzToEl.value = 30;
+  sSurahFromEl.value = 'الفاتحة'; sSurahToEl.value = 'الناس';
   setSelectedWeekdays([0,1,2,3,4,5,6]);
-  document.getElementById('tathbitOptions').style.display = 'none';
   document.getElementById('dailyTargetField').style.display = 'block';
-  document.getElementById('pathTargetField').style.display = 'block';
-  settingsThursdaySteps = [];
-  settingsTathbitJuz = [];
-  renderThursdaySteps();
-  applySettingsDirDefault();
+  document.getElementById('tathbitNisabField').style.display = 'none';
+  document.getElementById('tathbitNisabText').value = '';
 }
 let settingsMinimal = false;
 function openNewPlanForm(){
@@ -930,22 +901,18 @@ function loadSettingsForContext(){
     document.getElementById('settingsQuantity').value = plan.qty;
     setSelectedWeekdays(plan.activeDays || [0,1,2,3,4,5,6]);
     document.querySelectorAll('[data-follow-settings]').forEach(b=> b.classList.toggle('active', b.dataset.followSettings === plan.followType));
-    document.querySelectorAll('[data-settings-dir]').forEach(b=> b.classList.toggle('active', b.dataset.settingsDir === plan.direction));
     document.querySelectorAll('[data-settings-mode]').forEach(b=> b.classList.toggle('active', b.dataset.settingsMode === plan.targetMode));
-    settingsDirection = plan.direction; settingsTargetMode = plan.targetMode;
-    sJuzEl.style.display = settingsTargetMode==='جزء'?'block':'none';
-    sSurahEl.style.display = settingsTargetMode==='سورة'?'block':'none';
-    if(settingsTargetMode==='جزء') sJuzEl.value = plan.rawTarget; else sSurahEl.value = plan.rawTarget;
+    settingsTargetMode = plan.targetMode;
+    sJuzFromEl.style.display = settingsTargetMode==='جزء'?'block':'none';
+    sJuzToEl.style.display = settingsTargetMode==='جزء'?'block':'none';
+    sSurahFromEl.style.display = settingsTargetMode==='سورة'?'block':'none';
+    sSurahToEl.style.display = settingsTargetMode==='سورة'?'block':'none';
+    if(settingsTargetMode==='جزء'){ sJuzFromEl.value = plan.rangeFrom; sJuzToEl.value = plan.rangeTo; }
+    else { sSurahFromEl.value = plan.rangeFrom; sSurahToEl.value = plan.rangeTo; }
     const isTathbit = plan.followType === 'التثبيت';
-    document.getElementById('tathbitOptions').style.display = isTathbit ? 'block' : 'none';
     document.getElementById('dailyTargetField').style.display = isTathbit ? 'none' : 'block';
-    document.getElementById('pathTargetField').style.display = isTathbit ? 'none' : 'block';
-    if(isTathbit){
-      settingsTathbitJuz = (plan.tathbitJuz || []).slice();
-      renderTathbitJuzPicker();
-      settingsThursdaySteps = (plan.thursdaySteps || []).slice();
-      renderThursdaySteps();
-    }
+    document.getElementById('tathbitNisabField').style.display = isTathbit ? 'block' : 'none';
+    document.getElementById('tathbitNisabText').value = plan.nisabText || '';
     saveBtn.textContent = '💾 حفظ إعدادات الرحلة';
     saveBtn.disabled = false;
   } else {
@@ -964,22 +931,21 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
   if(!startVal) missing.push('تاريخ البداية');
   if(!endVal) missing.push('تاريخ النهاية');
   if(startVal && endVal && new Date(endVal) < new Date(startVal)) missing.push('تاريخ نهاية صحيح (بعد تاريخ البداية)');
-  const followBtnCheck = document.querySelector('[data-follow-settings].active');
-  const isTathbitCheck = followBtnCheck && followBtnCheck.dataset.followSettings === 'التثبيت';
-  if(isTathbitCheck && settingsTathbitJuz.length===0) missing.push('اختيار جزء واحد على الأقل للتثبيت');
   if(missing.length){
     errEl.textContent = '⚠️ الرجاء إكمال الحقول التالية: ' + missing.join('، ');
     errEl.style.display = 'block';
     return;
   }
-  const rawTarget = settingsTargetMode==='جزء' ? sJuzEl.value : sSurahEl.value;
-  const targetDisplay = settingsTargetMode==='جزء' ? ('الجزء '+rawTarget) : rawTarget;
+  const rangeFrom = settingsTargetMode==='جزء' ? sJuzFromEl.value : sSurahFromEl.value;
+  const rangeTo = settingsTargetMode==='جزء' ? sJuzToEl.value : sSurahToEl.value;
+  const targetDisplay = settingsTargetMode==='جزء'
+    ? (rangeFrom===rangeTo ? `الجزء ${rangeFrom}` : `من الجزء ${rangeFrom} إلى الجزء ${rangeTo}`)
+    : (rangeFrom===rangeTo ? rangeFrom : `من ${rangeFrom} إلى ${rangeTo}`);
   const followBtn = document.querySelector('[data-follow-settings].active');
   const activeDays = getSelectedWeekdays();
   const chosenFollowType = followBtn ? followBtn.dataset.followSettings : 'لم يُحدَّد';
   const isTathbit = chosenFollowType === 'التثبيت';
-  const thursdaySteps = isTathbit ? settingsThursdaySteps.slice() : [];
-  const tathbitJuz = isTathbit ? settingsTathbitJuz.slice().sort((a,b)=>a-b) : [];
+  const nisabText = isTathbit ? document.getElementById('tathbitNisabText').value.trim() : '';
 
   if(creatingNewPlan){
     const id = 'p' + (++planIdCounter);
@@ -989,13 +955,12 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
       endG: endVal,
       unit: document.getElementById('settingsUnit').value,
       qty: document.getElementById('settingsQuantity').value,
-      direction: settingsDirection,
       targetMode: settingsTargetMode,
-      rawTarget: rawTarget,
-      target: isTathbit ? ('الجزء ' + tathbitJuz.join('، ')) : targetDisplay,
+      rangeFrom, rangeTo,
+      target: nisabText || targetDisplay,
       activeDays,
       followType: chosenFollowType,
-      tathbitJuz, thursdaySteps
+      nisabText
     };
     plans.push(plan);
     addPlanPill(plan);
@@ -1012,11 +977,10 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
     plan.unit = document.getElementById('settingsUnit').value;
     plan.qty = document.getElementById('settingsQuantity').value;
     plan.activeDays = activeDays;
-    plan.direction = settingsDirection; plan.targetMode = settingsTargetMode; plan.rawTarget = rawTarget;
-    plan.target = isTathbit ? ('الجزء ' + tathbitJuz.join('، ')) : targetDisplay;
+    plan.targetMode = settingsTargetMode; plan.rangeFrom = rangeFrom; plan.rangeTo = rangeTo;
+    plan.target = nisabText || targetDisplay;
     plan.followType = chosenFollowType;
-    plan.tathbitJuz = tathbitJuz;
-    plan.thursdaySteps = thursdaySteps;
+    plan.nisabText = nisabText;
     buildPlanSchedule(plan);
     const pillBtn = document.querySelector(`.context-pill[data-context="plan:${plan.id}"]`);
     if(pillBtn) pillBtn.textContent = '📘 ' + plan.name;
@@ -1090,10 +1054,14 @@ function buildPlanSchedule(plan){
   const dayNamesAr = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
   const prevRows = planSchedules[plan.id] || [];
   let sequence = [];
+  let surahFromIdx = 0, surahToIdx = 113, surahDir = 1;
   if(plan.targetMode === 'جزء'){
-    const startJuz = parseInt(plan.rawTarget);
-    if(plan.direction === 'تصاعدي'){ for(let p=juzRanges[startJuz-1][0]; p<=604; p++) sequence.push(p); }
-    else { for(let p=juzRanges[startJuz-1][1]; p>=1; p--) sequence.push(p); }
+    const fromJ = parseInt(plan.rangeFrom), toJ = parseInt(plan.rangeTo);
+    if(fromJ <= toJ){ for(let p=juzRanges[fromJ-1][0]; p<=juzRanges[toJ-1][1]; p++) sequence.push(p); }
+    else { for(let p=juzRanges[fromJ-1][1]; p>=juzRanges[toJ-1][0]; p--) sequence.push(p); }
+  } else {
+    surahFromIdx = surahs.indexOf(plan.rangeFrom); surahToIdx = surahs.indexOf(plan.rangeTo);
+    surahDir = surahFromIdx <= surahToIdx ? 1 : -1;
   }
   const rows = [];
   let cursor = 0;
@@ -1114,11 +1082,13 @@ function buildPlanSchedule(plan){
       const ayahLabel = flatPages.map(p => pageAyahLabel(p)).join('، ');
       targetLabel = `${ayahLabel} (${pageLabel})`;
     } else {
-      const startIdx = surahs.indexOf(plan.rawTarget);
+      const totalSurahsInRange = Math.abs(surahToIdx - surahFromIdx) + 1;
       const perDay = Math.max(1, Math.round(parseFloat(plan.qty)));
-      const dir = plan.direction === 'تصاعدي' ? 1 : -1;
       const idxs = [];
-      for(let k=0;k<perDay;k++){ let idx = (startIdx + dir*(cursor+k)) % 114; if(idx<0) idx += 114; idxs.push(idx); }
+      for(let k=0;k<perDay;k++){
+        const pos = (cursor+k) % totalSurahsInRange;
+        idxs.push(surahFromIdx + surahDir*pos);
+      }
       cursor += perDay;
       targetLabel = idxs.map(ix=>surahs[ix]).join('، ');
     }
@@ -1140,15 +1110,11 @@ function buildTathbitSchedule(plan){
     const dow = d.getDay();
     const prev = prevRows[i];
     const dateStr = fmtDateInput(new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())));
-    const isRestDay = (dow===5 || dow===6);
-    const isThursday = (dow===4);
-    let taskLabels;
-    if(isThursday) taskLabels = (plan.thursdaySteps && plan.thursdaySteps.length) ? plan.thursdaySteps : ['أضف خطواتك الخاصة من الإعدادات'];
-    else if(isRestDay) taskLabels = [];
-    else taskLabels = tathbitTasksForWeekday(dow) || [];
+    const isRestDay = (dow===4 || dow===5 || dow===6);
+    let taskLabels = isRestDay ? [] : (tathbitTasksForWeekday(dow) || []);
     const prevTasks = prev && prev.tasks ? prev.tasks : [];
     const tasks = taskLabels.map((label,ti)=> ({ label, done: prevTasks[ti] && prevTasks[ti].label===label ? prevTasks[ti].done : false }));
-    rows.push({ date: dateStr, dayName: dayNamesAr[dow], isRestDay, isThursday, tasks, note: prev?prev.note:'' });
+    rows.push({ date: dateStr, dayName: dayNamesAr[dow], isRestDay, tasks, note: prev?prev.note:'' });
   }
   planSchedules[plan.id] = rows;
 }
@@ -1222,16 +1188,11 @@ function buildTathbitTable(plan){
       ? '🌙 يوم راحة'
       : r.tasks.map((t,ti)=>`<label style="display:flex; align-items:center; gap:6px; margin-bottom:4px; cursor:pointer;">
           <input type="checkbox" class="tathbit-task" data-row="${i}" data-task="${ti}" ${t.done?'checked':''}> <span style="font-size:12px;">${escapeHtml(t.label)}</span>
-          ${r.isThursday ? `<span class="chip-remove" data-remove-step="${ti}" style="cursor:pointer; opacity:.5; font-size:11px;">✕</span>` : ''}
-        </label>`).join('') + (r.isThursday ? `
-        <div style="display:flex; gap:6px; margin-top:6px;">
-          <input type="text" class="thursday-inline-input" placeholder="أضف خطوة..." style="flex:1; padding:6px 8px; border-radius:8px; border:1.5px solid var(--line); font-size:11.5px; font-family:var(--font-main);">
-          <button class="icon-btn thursday-inline-add" title="إضافة">➕</button>
-        </div>` : '');
+        </label>`).join('');
     return `<div class="gtable-row ${r.isRestDay?'rest-row':''}" data-row-idx="${i}">
       <div data-label="#">${i+1}</div>
       <div data-label="التاريخ">${r.date}</div>
-      <div data-label="اليوم">${r.dayName}${r.isThursday?' 🗓️':''}</div>
+      <div data-label="اليوم">${r.dayName}</div>
       <div data-label="المهام" style="flex-direction:column; align-items:flex-start; text-align:right;">${tasksHtml}</div>
       <div data-label="ملاحظات"><input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="ملاحظة..."></div>
     </div>`;
@@ -1241,24 +1202,6 @@ function buildTathbitTable(plan){
     const r = rows[cb.dataset.row];
     r.tasks[cb.dataset.task].done = cb.checked;
     if(cb.checked && tathbitRowDone(r)) burstConfetti(cb);
-    buildTathbitTable(plan);
-  }));
-  document.querySelectorAll('#tathbitTableBody .chip-remove[data-remove-step]').forEach(x=> x.addEventListener('click', (e)=>{
-    const rowEl = e.target.closest('[data-row-idx]');
-    const taskIdx = parseInt(x.dataset.removeStep);
-    const stepLabel = rows[parseInt(rowEl.dataset.rowIdx)].tasks[taskIdx].label;
-    plan.thursdaySteps = (plan.thursdaySteps||[]).filter(s=>s!==stepLabel);
-    buildPlanSchedule(plan);
-    buildTathbitTable(plan);
-  }));
-  document.querySelectorAll('#tathbitTableBody .thursday-inline-add').forEach(btn=> btn.addEventListener('click', (e)=>{
-    const rowEl = e.target.closest('[data-row-idx]');
-    const input = rowEl.querySelector('.thursday-inline-input');
-    const val = input.value.trim();
-    if(!val) return;
-    plan.thursdaySteps = plan.thursdaySteps || [];
-    plan.thursdaySteps.push(val);
-    buildPlanSchedule(plan);
     buildTathbitTable(plan);
   }));
 }
@@ -1487,6 +1430,9 @@ function applyPalette(p){
   document.documentElement.style.setProperty('--grad', `linear-gradient(120deg, ${c1} 0%, ${c2} 55%, ${c3} 100%)`);
   document.documentElement.style.setProperty('--grad-soft', `linear-gradient(120deg, ${c1}55 0%, ${c2}55 55%, ${c3}55 100%)`);
   document.documentElement.style.setProperty('--ok', p.accent);
+  document.documentElement.style.setProperty('--bg-a', c1);
+  document.documentElement.style.setProperty('--bg-b', c2);
+  document.documentElement.style.setProperty('--bg-c', c3);
   const deep = shadeColor(p.accent, -0.35);
   document.documentElement.style.setProperty('--grad-deep', `linear-gradient(120deg, ${p.accent}, ${deep})`);
 }
