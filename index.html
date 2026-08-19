@@ -42,11 +42,11 @@
   .topnav.nav-hidden{ display:none; }
   .nav-row{ max-width:1200px; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
   .nav-row.row1{ padding-bottom:10px; margin-bottom:8px; border-bottom:1px dashed var(--line); }
-  .nav-row.row2{ justify-content:flex-start; }
+  .nav-row.row2{ justify-content:space-between; }
   .nav-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
   .tight-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-  .nav-row.row2{ gap:0; }
-  .nav-row.row2 .nav-group{ gap:0; }
+  .nav-row.row2 .tight-group{ gap:2px; }
+  .nav-row.row2 .tight-group .nav-group{ gap:2px; }
   @media (max-width:760px){
     .topnav{ padding:10px 12px; }
     .brand{ font-size:13.5px; width:100%; margin-bottom:4px; }
@@ -267,10 +267,12 @@
     <button class="pill" data-page="achievements">🏆 الإنجازات</button>
     <button class="pill" data-page="settings">⚙️ الإعدادات</button>
   </div>
-  <div class="nav-row row2 tight-group">
-    <div class="nav-group" id="planPills"></div>
+  <div class="nav-row row2">
+    <div class="tight-group">
+      <div class="nav-group" id="planPills"></div>
+      <button class="pill action" id="navNewPlan">➕ خطة جديدة</button>
+    </div>
     <button class="pill" id="navQuran">📋 متابعة حفظ القرآن</button>
-    <button class="pill action" id="navNewPlan">➕ خطة جديدة</button>
   </div>
 </nav>
 
@@ -1154,7 +1156,7 @@ function buildTathbitSchedule(plan){
     else taskLabels = tathbitTasksForWeekday(dow) || [];
     const prevTasks = prev && prev.tasks ? prev.tasks : [];
     const tasks = taskLabels.map((label,ti)=> ({ label, done: prevTasks[ti] && prevTasks[ti].label===label ? prevTasks[ti].done : false }));
-    rows.push({ date: dateStr, dayName: dayNamesAr[dow], isRestDay, isThursday, tasks, note: prev?prev.note:'', nisab: prev?(prev.nisab||''):'' });
+    rows.push({ date: dateStr, dayName: dayNamesAr[dow], isRestDay, isThursday, tasks, note: prev?prev.note:'', nisab: prev?(prev.nisab||''):(isRestDay?'':(plan.target||'')) });
   }
   planSchedules[plan.id] = rows;
 }
@@ -1301,6 +1303,11 @@ function burstConfetti(el){
 /* ================= STATS ================= */
 function computePlanStats(plan){
   const rows = planSchedules[plan.id] || [];
+  if(plan.followType === 'التثبيت'){
+    const counted = rows.filter(r=>!r.isRestDay);
+    const totalDays = counted.length, doneDays = counted.filter(tathbitRowDone).length;
+    return {totalDays, doneDays, juzDone:null, hizbDone:null};
+  }
   const totalDays = rows.length, doneDays = rows.filter(r=>r.done).length;
   const juzDone = plan.targetMode==='جزء' ? Math.floor(doneDays * (Math.max(1,Math.round(parseFloat(plan.qty)*(plan.unit==='جزء'?20:plan.unit==='حزب'?10:0.5))) / 20)) : 0;
   const hizbDone = plan.targetMode==='جزء' ? Math.floor(doneDays * (Math.max(1,Math.round(parseFloat(plan.qty)*(plan.unit==='جزء'?20:plan.unit==='حزب'?10:0.5))) / 10)) : 0;
@@ -1358,9 +1365,10 @@ function refreshStats(){
     document.getElementById('statsContextLabel').textContent = `إحصائيات ${plan.name}`;
     const st = computePlanStats(plan);
     const pct = st.totalDays ? Math.round(st.doneDays/st.totalDays*100) : 0;
+    const isTathbitPlan = plan.followType === 'التثبيت';
     document.getElementById('spPct').textContent = pct+'%';
-    document.getElementById('spJuz').textContent = st.juzDone;
-    document.getElementById('spHizb').textContent = st.hizbDone;
+    document.getElementById('spJuz').textContent = isTathbitPlan ? '—' : st.juzDone;
+    document.getElementById('spHizb').textContent = isTathbitPlan ? '—' : st.hizbDone;
     document.getElementById('spDays').textContent = st.totalDays;
     document.getElementById('spRemaining').textContent = Math.max(0, st.totalDays-st.doneDays);
     document.getElementById('spAvg').textContent = pct+'%';
@@ -1370,12 +1378,22 @@ function refreshStats(){
     document.getElementById('planDonutEmpty').style.display = empty?'block':'none';
     document.getElementById('planDonutWrap').style.display = empty?'none':'block';
     if(!empty && window.Chart){
-      const counts = new Array(levelsHifz.length).fill(0);
-      rows.forEach(r=>counts[r.hifz]++);
+      let labels, data, colors;
+      if(isTathbitPlan){
+        labels = [`✅ مكتمل (${st.doneDays})`, `⏳ متبقٍ (${st.totalDays-st.doneDays})`];
+        data = [st.doneDays, st.totalDays-st.doneDays];
+        colors = ['#8fc7d8','#e7e3f5'];
+      } else {
+        const counts = new Array(levelsHifz.length).fill(0);
+        rows.forEach(r=>counts[r.hifz]++);
+        labels = levelsHifz.map((l,i)=>`${l} (${counts[i]})`);
+        data = counts;
+        colors = ['#e7e3f5','#cbb8f0','#a9d8ec','#e0a3ad','#d8b978','#8fc7d8'];
+      }
       if(chartDonutPlan) chartDonutPlan.destroy();
       chartDonutPlan = new Chart(document.getElementById('donutChartPlan').getContext('2d'), {
         type:'pie',
-        data:{labels:levelsHifz.map((l,i)=>`${l} (${counts[i]})`), datasets:[{data:counts, backgroundColor:['#e7e3f5','#cbb8f0','#a9d8ec','#e0a3ad','#d8b978','#8fc7d8'], borderColor:'#fff', borderWidth:2}]},
+        data:{labels, datasets:[{data, backgroundColor:colors, borderColor:'#fff', borderWidth:2}]},
         options:{
           responsive:true, maintainAspectRatio:false,
           plugins:{
