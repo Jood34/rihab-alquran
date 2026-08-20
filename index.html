@@ -42,11 +42,10 @@
   .topnav.nav-hidden{ display:none; }
   .nav-row{ max-width:1200px; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
   .nav-row.row1{ padding-bottom:10px; margin-bottom:8px; border-bottom:1px dashed var(--line); }
-  .nav-row.row2{ justify-content:space-between; }
   .nav-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
   .tight-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-  .nav-row.row2 .tight-group{ gap:2px; }
-  .nav-row.row2 .tight-group .nav-group{ gap:2px; }
+  .nav-row.row2.tight-group{ gap:4px; }
+  .nav-row.row2 .nav-group{ gap:4px; }
   @media (max-width:760px){
     .topnav{ padding:10px 12px; }
     .brand{ font-size:13.5px; width:100%; margin-bottom:4px; }
@@ -267,12 +266,10 @@
     <button class="pill" data-page="achievements">🏆 الإنجازات</button>
     <button class="pill" data-page="settings">⚙️ الإعدادات</button>
   </div>
-  <div class="nav-row row2">
-    <div class="tight-group">
-      <div class="nav-group" id="planPills"></div>
-      <button class="pill action" id="navNewPlan">➕ خطة جديدة</button>
-    </div>
+  <div class="nav-row row2 tight-group">
     <button class="pill" id="navQuran">📋 متابعة حفظ القرآن</button>
+    <div class="nav-group" id="planPills"></div>
+    <button class="pill action" id="navNewPlan">➕ خطة جديدة</button>
   </div>
 </nav>
 
@@ -322,7 +319,7 @@
         <div class="plan-summary" id="planTableSummary"></div>
         <div class="gtable" id="planGtable">
           <div class="gtable-head" id="planGtableHead">
-            <div>#</div><div>التاريخ</div><div>اليوم</div><div>الهدف اليومي</div><div>مستوى الحفظ</div><div>ملاحظات</div><div>الإنجاز</div>
+            <div>#</div><div>التاريخ</div><div>اليوم</div><div>الهدف اليومي</div><div id="planLevelHeader">مستوى الحفظ</div><div>ملاحظات</div><div>الإنجاز</div>
           </div>
           <div id="planTableBody"></div>
         </div>
@@ -356,7 +353,7 @@
           <div class="stat-tile"><span class="em">🔥</span><div class="val">—</div><div class="lbl">الأيام المتتالية</div></div>
           <div class="stat-tile"><span class="em">📈</span><div class="val" id="spAvg">0%</div><div class="lbl">متوسط الإنجاز</div></div>
         </div>
-        <div class="chart-block">
+        <div class="chart-block" id="planDonutBlock">
           <h3>🧩 توزيع مستوى الإنجاز</h3>
           <div id="planDonutWrap" class="chart-wrap"><canvas id="donutChartPlan"></canvas></div>
           <div class="chart-empty" id="planDonutEmpty" style="display:none;">لا توجد بيانات كافية بعد</div>
@@ -466,6 +463,11 @@
             <div><div class="hint">وحدة القياس</div><select id="settingsUnit"><option value="جزء">جزء</option><option value="حزب">حزب</option><option value="وجه">وجه</option></select></div>
             <div><div class="hint">الكمية اليومية</div><select id="settingsQuantity"><option value="0.5">0.5</option><option value="1" selected>1</option><option value="1.5">1.5</option><option value="2">2</option></select></div>
           </div>
+          <label style="display:flex; align-items:center; gap:8px; margin-top:12px; cursor:pointer; font-size:13px;">
+            <input type="checkbox" id="autoDivideToggle" style="width:16px; height:16px;">
+            🔢 قسّم الكمية تلقائيًا على عدد الأيام
+          </label>
+          <p class="hint" id="autoDivideResult" style="display:none; margin-top:6px;"></p>
         </div>
 
         <div class="field" id="pathTargetField">
@@ -509,6 +511,7 @@
             <div class="seg-btn" data-follow-settings="المراجعة">🔁 المراجعة</div>
             <div class="seg-btn" data-follow-settings="ضبط التجويد">⚙️ ضبط التجويد</div>
             <div class="seg-btn" data-follow-settings="التثبيت">🔒 التثبيت</div>
+            <div class="seg-btn" data-follow-settings="التلاوة">📖 التلاوة</div>
           </div>
         </div>
 
@@ -782,6 +785,7 @@ function gregorianToJDN(y,m,d){ const a = Math.floor((14-m)/12), yy = y+4800-a, 
 function jdnToGregorianDate(jdn){ const a = jdn + 32044, b = Math.floor((4*a+3)/146097), c = a - Math.floor((146097*b)/4); const d = Math.floor((4*c+3)/1461), e = c - Math.floor((1461*d)/4), m = Math.floor((5*e+2)/153); const day = e - Math.floor((153*m+2)/5) + 1, month = m+3-12*Math.floor(m/10), year = 100*b+d-4800+Math.floor(m/10); return new Date(Date.UTC(year, month-1, day)); }
 function hijriToGregorian(day, month, year){ const estJDN = Math.round(1948440 + (year-1)*354.3667 + (month-1)*29.5306 + day - 1); let guess = jdnToGregorianDate(estJDN); for(let offset=-6; offset<=6; offset++){ const d = new Date(guess.getTime() + offset*86400000); const h = gregorianToHijri(d); if(h.day===day && h.month===month && h.year===year) return d; } return guess; }
 function fmtDateInput(date){ const y=date.getUTCFullYear(), m=String(date.getUTCMonth()+1).padStart(2,'0'), d=String(date.getUTCDate()).padStart(2,'0'); return `${y}-${m}-${d}`; }
+function parseLocalDate(str){ return str ? new Date(str+'T00:00:00') : null; }
 let syncingDates = false;
 function wireDateSync(gregId, dayId, monthId, yearId){
   const gEl = document.getElementById(gregId), dEl = document.getElementById(dayId), mEl = document.getElementById(monthId), yEl = document.getElementById(yearId);
@@ -815,7 +819,7 @@ function updateDayCountFromDates(){
   if(syncingDayCount) return;
   const s = document.getElementById('settingsStartDateG').value, e = document.getElementById('settingsEndDateG').value;
   if(s && e){
-    const days = countActiveDaysBetween(new Date(s), new Date(e), getSelectedWeekdays());
+    const days = countActiveDaysBetween(parseLocalDate(s), parseLocalDate(e), getSelectedWeekdays());
     syncingDayCount = true;
     document.getElementById('settingsDayCount').value = days>0 ? days : '';
     syncingDayCount = false;
@@ -826,7 +830,7 @@ function recalcEndDateFromCount(){
   const dc = parseInt(document.getElementById('settingsDayCount').value);
   if(s && dc>0){
     syncingDayCount = true;
-    const endDate = dateAfterActiveDays(new Date(s), dc, getSelectedWeekdays());
+    const endDate = dateAfterActiveDays(parseLocalDate(s), dc, getSelectedWeekdays());
     document.getElementById('settingsEndDateG').value = fmtDateInput(endDate);
     syncingDayCount = false;
   }
@@ -854,6 +858,45 @@ surahs.forEach(s=>{
 sJuzFromEl.value = 1; sJuzToEl.value = 30;
 sSurahFromEl.value = 'الفاتحة'; sSurahToEl.value = 'الناس';
 
+/* ---- auto-divide quantity over number of days ---- */
+let autoDivideQty = null;
+function computeAutoDivide(){
+  const toggle = document.getElementById('autoDivideToggle');
+  const resultEl = document.getElementById('autoDivideResult');
+  const qtySelect = document.getElementById('settingsQuantity');
+  if(!toggle.checked){ resultEl.style.display='none'; qtySelect.disabled=false; autoDivideQty=null; return; }
+  qtySelect.disabled = true;
+  const unit = document.getElementById('settingsUnit').value;
+  let totalPages = 0;
+  if(settingsTargetMode === 'جزء'){
+    const f = parseInt(sJuzFromEl.value), t = parseInt(sJuzToEl.value);
+    const lo = Math.min(f,t), hi = Math.max(f,t);
+    totalPages = juzRanges[hi-1][1] - juzRanges[lo-1][0] + 1;
+  } else {
+    const fIdx = surahs.indexOf(sSurahFromEl.value), tIdx = surahs.indexOf(sSurahToEl.value);
+    const lo = Math.min(fIdx,tIdx), hi = Math.max(fIdx,tIdx);
+    totalPages = surahPageRanges[hi][1] - surahPageRanges[lo][0] + 1;
+  }
+  const s = document.getElementById('settingsStartDateG').value, e = document.getElementById('settingsEndDateG').value;
+  let totalDays = (s && e) ? countActiveDaysBetween(parseLocalDate(s), parseLocalDate(e), getSelectedWeekdays()) : 0;
+  const unitFactor = unit==='جزء'?20:unit==='حزب'?10:0.5;
+  const totalQty = totalPages/unitFactor;
+  resultEl.style.display = 'block';
+  if(totalDays>0){
+    autoDivideQty = totalQty/totalDays;
+    resultEl.textContent = `📊 الكمية المحسوبة: ${autoDivideQty.toFixed(2)} ${unit}/يوم (${totalPages} صفحة على ${totalDays} يوم)`;
+  } else {
+    autoDivideQty = null;
+    resultEl.textContent = '⚠️ حدّد تاريخ البداية والنهاية أولًا لحساب الكمية.';
+  }
+}
+document.getElementById('autoDivideToggle').addEventListener('change', computeAutoDivide);
+document.getElementById('settingsUnit').addEventListener('change', computeAutoDivide);
+[sJuzFromEl, sJuzToEl, sSurahFromEl, sSurahToEl].forEach(el=> el.addEventListener('change', computeAutoDivide));
+document.getElementById('settingsStartDateG').addEventListener('change', computeAutoDivide);
+document.getElementById('settingsEndDateG').addEventListener('change', computeAutoDivide);
+document.getElementById('settingsDayCount').addEventListener('input', ()=> setTimeout(computeAutoDivide, 0));
+
 let settingsTargetMode = 'جزء';
 document.querySelectorAll('[data-settings-mode]').forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -880,6 +923,7 @@ document.querySelectorAll('#weekdayPicker .chip').forEach(chip=>{
     if(!document.querySelectorAll('#weekdayPicker .chip.active').length) chip.classList.add('active'); // never allow zero days
     const dc = document.getElementById('settingsDayCount').value;
     if(dc) recalcEndDateFromCount(); else updateDayCountFromDates();
+    computeAutoDivide();
   });
 });
 function getSelectedWeekdays(){
@@ -916,6 +960,10 @@ function resetJourneyForm(){
   sSurahFromEl.value = 'الفاتحة'; sSurahToEl.value = 'الناس';
   setSelectedWeekdays([0,1,2,3,4,5,6]);
   document.getElementById('dailyTargetField').style.display = 'block';
+  document.getElementById('autoDivideToggle').checked = false;
+  document.getElementById('settingsQuantity').disabled = false;
+  document.getElementById('autoDivideResult').style.display = 'none';
+  autoDivideQty = null;
 }
 let settingsMinimal = false;
 function openNewPlanForm(){
@@ -952,6 +1000,8 @@ function loadSettingsForContext(){
     sSurahToEl.style.display = settingsTargetMode==='سورة'?'block':'none';
     if(settingsTargetMode==='جزء'){ sJuzFromEl.value = plan.rangeFrom; sJuzToEl.value = plan.rangeTo; }
     else { sSurahFromEl.value = plan.rangeFrom; sSurahToEl.value = plan.rangeTo; }
+    document.getElementById('autoDivideToggle').checked = !!plan.autoDivide;
+    computeAutoDivide();
     const isTathbit = plan.followType === 'التثبيت';
     document.getElementById('dailyTargetField').style.display = isTathbit ? 'none' : 'block';
     saveBtn.textContent = '💾 حفظ إعدادات الرحلة';
@@ -971,7 +1021,7 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
   if(!nameVal) missing.push('اسم الخطة');
   if(!startVal) missing.push('تاريخ البداية');
   if(!endVal) missing.push('تاريخ النهاية');
-  if(startVal && endVal && new Date(endVal) < new Date(startVal)) missing.push('تاريخ نهاية صحيح (بعد تاريخ البداية)');
+  if(startVal && endVal && parseLocalDate(endVal) < parseLocalDate(startVal)) missing.push('تاريخ نهاية صحيح (بعد تاريخ البداية)');
   if(missing.length){
     errEl.textContent = '⚠️ الرجاء إكمال الحقول التالية: ' + missing.join('، ');
     errEl.style.display = 'block';
@@ -986,6 +1036,8 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
   const activeDays = getSelectedWeekdays();
   const chosenFollowType = followBtn ? followBtn.dataset.followSettings : 'لم يُحدَّد';
   const isTathbit = chosenFollowType === 'التثبيت';
+  const autoDivideOn = document.getElementById('autoDivideToggle').checked;
+  const finalQty = (autoDivideOn && autoDivideQty!=null) ? autoDivideQty : parseFloat(document.getElementById('settingsQuantity').value);
 
   if(creatingNewPlan){
     const id = 'p' + (++planIdCounter);
@@ -994,7 +1046,8 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
       startG: startVal,
       endG: endVal,
       unit: document.getElementById('settingsUnit').value,
-      qty: document.getElementById('settingsQuantity').value,
+      qty: finalQty,
+      autoDivide: autoDivideOn,
       targetMode: settingsTargetMode,
       rangeFrom, rangeTo,
       target: targetDisplay,
@@ -1014,7 +1067,8 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
     plan.startG = document.getElementById('settingsStartDateG').value;
     plan.endG = document.getElementById('settingsEndDateG').value;
     plan.unit = document.getElementById('settingsUnit').value;
-    plan.qty = document.getElementById('settingsQuantity').value;
+    plan.qty = finalQty;
+    plan.autoDivide = autoDivideOn;
     plan.activeDays = activeDays;
     plan.targetMode = settingsTargetMode; plan.rangeFrom = rangeFrom; plan.rangeTo = rangeTo;
     plan.target = plan.target && isTathbit ? plan.target : targetDisplay;
@@ -1117,7 +1171,9 @@ function buildPlanSchedule(plan){
       cursor += pagesPerDay;
       const flatPages = segs.flat();
       const pageLabel = segs.map(seg => seg.length===1 ? `صفحة ${seg[0]}` : `صفحة ${seg[0]}-${seg[seg.length-1]}`).join(' + ');
-      const ayahLabel = flatPages.map(p => pageAyahLabel(p)).join('، ');
+      const ayahLabel = flatPages.length <= 3
+        ? flatPages.map(p => pageAyahLabel(p)).join('، ')
+        : `من ${pageAyahLabel(flatPages[0])} إلى ${pageAyahLabel(flatPages[flatPages.length-1])}`;
       targetLabel = `${ayahLabel} (${pageLabel})`;
     } else {
       const totalSurahsInRange = Math.abs(surahToIdx - surahFromIdx) + 1;
@@ -1164,12 +1220,15 @@ function planTypeIcon(followType){
   if(followType==='الحفظ') return '🧠';
   if(followType==='المراجعة') return '🔁';
   if(followType==='ضبط التجويد') return '⚙️';
+  if(followType==='التلاوة') return '📖';
   return '📁';
 }
 let planTableFilter = 'all';
 function buildPlanTable(plan){
   if(plan.followType === 'التثبيت'){ buildTathbitTable(plan); return; }
   if(!planSchedules[plan.id]) buildPlanSchedule(plan);
+  const isTilawah = plan.followType === 'التلاوة';
+  document.getElementById('planLevelHeader').textContent = isTilawah ? 'النوع' : 'مستوى الحفظ';
   const rows = planSchedules[plan.id];
   const total = rows.length, completed = rows.filter(r=>r.done).length;
   document.getElementById('planTableSummary').innerHTML =
@@ -1187,7 +1246,7 @@ function buildPlanTable(plan){
     <div data-label="التاريخ">${r.date}</div>
     <div data-label="اليوم">${r.dayName}</div>
     <div data-label="الهدف اليومي">${escapeHtml(r.target)}</div>
-    <div data-label="مستوى الحفظ">${r.isRestDay ? '—' : buildLevelSelect(levelsHifz,'hifz',i,r.hifz)}</div>
+    <div data-label="${isTilawah?'النوع':'مستوى الحفظ'}">${r.isRestDay ? '—' : (isTilawah ? '📖 إنجاز النصاب' : buildLevelSelect(levelsHifz,'hifz',i,r.hifz))}</div>
     <div data-label="ملاحظات"><input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="ملاحظة..."></div>
     <div class="ach-cell gcell-actions" data-label="الإنجاز">
       ${r.isRestDay ? '—' : `
@@ -1227,9 +1286,9 @@ function buildTathbitTable(plan){
     if(r.isRestDay){
       tasksHtml = '🌙 يوم راحة';
     } else {
-      tasksHtml = `<div style="display:flex; gap:6px; align-items:center; margin-bottom:6px; width:100%;">
-        <span style="font-size:11px; flex-shrink:0;">📘 النصاب:</span>
-        <input type="text" class="nisab-inline-input" data-idx="${i}" value="${escapeHtml(r.nisab||'')}" placeholder="اكتب النصاب..." style="flex:1; padding:5px 8px; border-radius:8px; border:1.5px solid var(--line); font-size:11.5px; font-family:var(--font-main);">
+      tasksHtml = `<div style="width:100%; margin-bottom:8px;">
+        <div style="font-size:11px; font-weight:700; margin-bottom:4px;">📘 النصاب</div>
+        <input type="text" class="nisab-inline-input" data-idx="${i}" value="${escapeHtml(r.nisab||'')}" placeholder="اكتب النصاب..." style="width:100%; padding:6px 8px; border-radius:8px; border:1.5px solid var(--line); font-size:11.5px; font-family:var(--font-main); box-sizing:border-box;">
       </div>`;
       tasksHtml += r.tasks.map((t,ti)=>`<label style="display:flex; align-items:center; gap:6px; margin-bottom:4px; cursor:pointer;">
           <input type="checkbox" class="tathbit-task" data-row="${i}" data-task="${ti}" ${t.done?'checked':''}> <span style="font-size:12px;">${escapeHtml(t.label)}</span>
@@ -1374,10 +1433,12 @@ function refreshStats(){
     document.getElementById('spAvg').textContent = pct+'%';
 
     const rows = planSchedules[plan.id] || [];
+    const isTilawahPlan = plan.followType === 'التلاوة';
+    document.getElementById('planDonutBlock').style.display = isTilawahPlan ? 'none' : 'block';
     const empty = st.doneDays===0;
     document.getElementById('planDonutEmpty').style.display = empty?'block':'none';
     document.getElementById('planDonutWrap').style.display = empty?'none':'block';
-    if(!empty && window.Chart){
+    if(!isTilawahPlan && !empty && window.Chart){
       let labels, data, colors;
       if(isTathbitPlan){
         labels = [`✅ مكتمل (${st.doneDays})`, `⏳ متبقٍ (${st.totalDays-st.doneDays})`];
