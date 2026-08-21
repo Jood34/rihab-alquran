@@ -43,9 +43,10 @@
   .nav-row{ max-width:1200px; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
   .nav-row.row1{ padding-bottom:10px; margin-bottom:8px; border-bottom:1px dashed var(--line); }
   .nav-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-  .tight-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .tight-group{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
   .nav-row.row2.tight-group{ gap:4px; }
   .nav-row.row2 .nav-group{ gap:4px; }
+  .nav-small-pill{ font-size:11.5px; padding:7px 12px; min-height:32px; }
   @media (max-width:760px){
     .topnav{ padding:10px 12px; }
     .brand{ font-size:13.5px; width:100%; margin-bottom:4px; }
@@ -267,9 +268,9 @@
     <button class="pill" data-page="settings">⚙️ الإعدادات</button>
   </div>
   <div class="nav-row row2 tight-group">
-    <button class="pill" id="navQuran">📋 متابعة حفظ القرآن</button>
+    <button class="pill nav-small-pill" id="navQuran">📋 متابعة حفظ القرآن</button>
     <div class="nav-group" id="planPills"></div>
-    <button class="pill action" id="navNewPlan">➕ خطة جديدة</button>
+    <button class="pill action nav-small-pill" id="navNewPlan">➕ خطة جديدة</button>
   </div>
 </nav>
 
@@ -411,6 +412,15 @@
         <h3>🧭 إعداد الرحلة</h3>
         <p class="desc" id="settingsContextHint">—</p>
 
+        <div class="field" id="uploadPlanField" style="display:none;">
+          <div class="field-label">📤 رفع خطة (تعبئة تلقائية)</div>
+          <p class="hint" style="margin-bottom:8px;">اختر خطة موجودة لتعبئة الحقول تلقائيًا منها، ثم عدّلها كما تريد.</p>
+          <div class="row2">
+            <select id="uploadSourcePlan"></select>
+            <button class="edit-plan-btn" id="uploadPlanBtn" type="button" style="width:100%;">⬆️ تعبئة تلقائي</button>
+          </div>
+        </div>
+
         <div class="field">
           <div class="field-label">اسم الخطة</div>
           <input type="text" id="settingsPlanName" placeholder="مثال: خطة حفظ القرآن">
@@ -461,7 +471,10 @@
           <div class="field-label"><span class="em">🎯</span> الهدف اليومي</div>
           <div class="row2">
             <div><div class="hint">وحدة القياس</div><select id="settingsUnit"><option value="جزء">جزء</option><option value="حزب">حزب</option><option value="وجه">وجه</option></select></div>
-            <div><div class="hint">الكمية اليومية</div><select id="settingsQuantity"><option value="0.5">0.5</option><option value="1" selected>1</option><option value="1.5">1.5</option><option value="2">2</option></select></div>
+            <div><div class="hint">الكمية اليومية</div>
+              <select id="settingsQuantity"><option value="0.5">0.5</option><option value="1" selected>1</option><option value="1.5">1.5</option><option value="2">2</option><option value="other">أخرى...</option></select>
+              <input type="number" id="settingsQuantityOther" min="0.1" step="0.1" placeholder="اكتب أي رقم" style="display:none; margin-top:8px;">
+            </div>
           </div>
           <label style="display:flex; align-items:center; gap:8px; margin-top:12px; cursor:pointer; font-size:13px;">
             <input type="checkbox" id="autoDivideToggle" style="width:16px; height:16px;">
@@ -859,6 +872,25 @@ sJuzFromEl.value = 1; sJuzToEl.value = 30;
 sSurahFromEl.value = 'الفاتحة'; sSurahToEl.value = 'الناس';
 
 /* ---- auto-divide quantity over number of days ---- */
+function getSettingsQty(){
+  const sel = document.getElementById('settingsQuantity');
+  if(sel.value === 'other'){
+    const v = parseFloat(document.getElementById('settingsQuantityOther').value);
+    return isNaN(v) ? 1 : v;
+  }
+  return parseFloat(sel.value);
+}
+function setSettingsQty(qty){
+  const sel = document.getElementById('settingsQuantity');
+  const match = Array.from(sel.options).find(o => o.value!=='other' && parseFloat(o.value)===parseFloat(qty));
+  const otherInput = document.getElementById('settingsQuantityOther');
+  if(match){ sel.value = match.value; otherInput.style.display='none'; }
+  else { sel.value = 'other'; otherInput.style.display='block'; otherInput.value = qty; }
+}
+document.getElementById('settingsQuantity').addEventListener('change', ()=>{
+  document.getElementById('settingsQuantityOther').style.display = document.getElementById('settingsQuantity').value === 'other' ? 'block' : 'none';
+});
+
 let autoDivideQty = null;
 function computeAutoDivide(){
   const toggle = document.getElementById('autoDivideToggle');
@@ -951,6 +983,8 @@ function resetJourneyForm(){
   ['settingsHijriDayStart','settingsHijriMonthStart','settingsHijriYearStart','settingsHijriDayEnd','settingsHijriMonthEnd','settingsHijriYearEnd'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('settingsUnit').value='جزء';
   document.getElementById('settingsQuantity').value='1';
+  document.getElementById('settingsQuantityOther').style.display='none';
+  document.getElementById('settingsQuantityOther').value='';
   document.querySelectorAll('[data-follow-settings]').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('[data-settings-mode]').forEach(b=>b.classList.toggle('active', b.dataset.settingsMode==='جزء'));
   settingsTargetMode='جزء';
@@ -974,11 +1008,39 @@ function openNewPlanForm(){
   document.getElementById('settingsSaveBtn').textContent = '💾 إنشاء الخطة';
   document.getElementById('settingsSaveBtn').disabled = false;
   document.getElementById('settingsExtraBlocks').style.display = 'none';
+  document.getElementById('uploadPlanField').style.display = plans.length ? 'block' : 'none';
+  populateUploadSourcePlans();
   showPage('settings');
 }
+function populateUploadSourcePlans(){
+  const sel = document.getElementById('uploadSourcePlan');
+  sel.innerHTML = plans.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+}
+document.getElementById('uploadPlanBtn').addEventListener('click', ()=>{
+  const src = plans.find(p=>p.id===document.getElementById('uploadSourcePlan').value);
+  if(!src) return;
+  document.getElementById('settingsPlanName').value = 'نسخة من ' + src.name;
+  document.getElementById('settingsUnit').value = src.unit;
+  setSettingsQty(src.qty);
+  document.getElementById('autoDivideToggle').checked = !!src.autoDivide;
+  document.querySelectorAll('[data-follow-settings]').forEach(b=> b.classList.toggle('active', b.dataset.followSettings === src.followType));
+  const isTathbitSrc = src.followType === 'التثبيت';
+  document.getElementById('dailyTargetField').style.display = isTathbitSrc ? 'none' : 'block';
+  document.querySelectorAll('[data-settings-mode]').forEach(b=> b.classList.toggle('active', b.dataset.settingsMode === src.targetMode));
+  settingsTargetMode = src.targetMode;
+  sJuzFromEl.style.display = settingsTargetMode==='جزء'?'block':'none';
+  sJuzToEl.style.display = settingsTargetMode==='جزء'?'block':'none';
+  sSurahFromEl.style.display = settingsTargetMode==='سورة'?'block':'none';
+  sSurahToEl.style.display = settingsTargetMode==='سورة'?'block':'none';
+  if(settingsTargetMode==='جزء'){ sJuzFromEl.value = src.rangeFrom; sJuzToEl.value = src.rangeTo; }
+  else { sSurahFromEl.value = src.rangeFrom; sSurahToEl.value = src.rangeTo; }
+  setSelectedWeekdays(src.activeDays || [0,1,2,3,4,5,6]);
+  computeAutoDivide();
+});
 function loadSettingsForContext(){
   document.getElementById('journeyFormError').style.display = 'none';
   document.getElementById('settingsExtraBlocks').style.display = settingsMinimal ? 'none' : 'block';
+  document.getElementById('uploadPlanField').style.display = 'none';
   const hint = document.getElementById('settingsContextHint');
   const saveBtn = document.getElementById('settingsSaveBtn');
   if(activeContext && activeContext.startsWith('plan:')){
@@ -989,7 +1051,7 @@ function loadSettingsForContext(){
     document.getElementById('settingsEndDateG').value = plan.endG || '';
     updateDayCountFromDates();
     document.getElementById('settingsUnit').value = plan.unit;
-    document.getElementById('settingsQuantity').value = plan.qty;
+    setSettingsQty(plan.qty);
     setSelectedWeekdays(plan.activeDays || [0,1,2,3,4,5,6]);
     document.querySelectorAll('[data-follow-settings]').forEach(b=> b.classList.toggle('active', b.dataset.followSettings === plan.followType));
     document.querySelectorAll('[data-settings-mode]').forEach(b=> b.classList.toggle('active', b.dataset.settingsMode === plan.targetMode));
@@ -1037,7 +1099,7 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
   const chosenFollowType = followBtn ? followBtn.dataset.followSettings : 'لم يُحدَّد';
   const isTathbit = chosenFollowType === 'التثبيت';
   const autoDivideOn = document.getElementById('autoDivideToggle').checked;
-  const finalQty = (autoDivideOn && autoDivideQty!=null) ? autoDivideQty : parseFloat(document.getElementById('settingsQuantity').value);
+  const finalQty = (autoDivideOn && autoDivideQty!=null) ? autoDivideQty : getSettingsQty();
 
   if(creatingNewPlan){
     const id = 'p' + (++planIdCounter);
