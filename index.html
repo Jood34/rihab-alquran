@@ -46,7 +46,7 @@
   .tight-group{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
   .nav-row.row2.tight-group{ gap:4px; }
   .nav-row.row2 .nav-group{ gap:4px; }
-  .nav-small-pill{ font-size:11.5px; padding:7px 12px; min-height:32px; }
+  .pill.nav-small-pill{ font-size:11.5px; padding:7px 12px; min-height:32px; }
   @media (max-width:760px){
     .topnav{ padding:10px 12px; }
     .brand{ font-size:13.5px; width:100%; margin-bottom:4px; }
@@ -411,15 +411,6 @@
       <div class="settings-block">
         <h3>🧭 إعداد الرحلة</h3>
         <p class="desc" id="settingsContextHint">—</p>
-
-        <div class="field" id="uploadPlanField" style="display:none;">
-          <div class="field-label">📤 رفع خطة (تعبئة تلقائية)</div>
-          <p class="hint" style="margin-bottom:8px;">اختر خطة موجودة لتعبئة الحقول تلقائيًا منها، ثم عدّلها كما تريد.</p>
-          <div class="row2">
-            <select id="uploadSourcePlan"></select>
-            <button class="edit-plan-btn" id="uploadPlanBtn" type="button" style="width:100%;">⬆️ تعبئة تلقائي</button>
-          </div>
-        </div>
 
         <div class="field">
           <div class="field-label">اسم الخطة</div>
@@ -1008,39 +999,11 @@ function openNewPlanForm(){
   document.getElementById('settingsSaveBtn').textContent = '💾 إنشاء الخطة';
   document.getElementById('settingsSaveBtn').disabled = false;
   document.getElementById('settingsExtraBlocks').style.display = 'none';
-  document.getElementById('uploadPlanField').style.display = plans.length ? 'block' : 'none';
-  populateUploadSourcePlans();
   showPage('settings');
 }
-function populateUploadSourcePlans(){
-  const sel = document.getElementById('uploadSourcePlan');
-  sel.innerHTML = plans.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
-}
-document.getElementById('uploadPlanBtn').addEventListener('click', ()=>{
-  const src = plans.find(p=>p.id===document.getElementById('uploadSourcePlan').value);
-  if(!src) return;
-  document.getElementById('settingsPlanName').value = 'نسخة من ' + src.name;
-  document.getElementById('settingsUnit').value = src.unit;
-  setSettingsQty(src.qty);
-  document.getElementById('autoDivideToggle').checked = !!src.autoDivide;
-  document.querySelectorAll('[data-follow-settings]').forEach(b=> b.classList.toggle('active', b.dataset.followSettings === src.followType));
-  const isTathbitSrc = src.followType === 'التثبيت';
-  document.getElementById('dailyTargetField').style.display = isTathbitSrc ? 'none' : 'block';
-  document.querySelectorAll('[data-settings-mode]').forEach(b=> b.classList.toggle('active', b.dataset.settingsMode === src.targetMode));
-  settingsTargetMode = src.targetMode;
-  sJuzFromEl.style.display = settingsTargetMode==='جزء'?'block':'none';
-  sJuzToEl.style.display = settingsTargetMode==='جزء'?'block':'none';
-  sSurahFromEl.style.display = settingsTargetMode==='سورة'?'block':'none';
-  sSurahToEl.style.display = settingsTargetMode==='سورة'?'block':'none';
-  if(settingsTargetMode==='جزء'){ sJuzFromEl.value = src.rangeFrom; sJuzToEl.value = src.rangeTo; }
-  else { sSurahFromEl.value = src.rangeFrom; sSurahToEl.value = src.rangeTo; }
-  setSelectedWeekdays(src.activeDays || [0,1,2,3,4,5,6]);
-  computeAutoDivide();
-});
 function loadSettingsForContext(){
   document.getElementById('journeyFormError').style.display = 'none';
   document.getElementById('settingsExtraBlocks').style.display = settingsMinimal ? 'none' : 'block';
-  document.getElementById('uploadPlanField').style.display = 'none';
   const hint = document.getElementById('settingsContextHint');
   const saveBtn = document.getElementById('settingsSaveBtn');
   if(activeContext && activeContext.startsWith('plan:')){
