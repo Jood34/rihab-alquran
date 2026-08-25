@@ -44,6 +44,7 @@
   .nav-row.row1{ padding-bottom:10px; margin-bottom:8px; border-bottom:1px dashed var(--line); }
   .nav-group{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
   .tight-group{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .nav-row.row1 .tight-group{ gap:26px; }
   .nav-row.row2.tight-group{ gap:4px; }
   .nav-row.row2 .nav-group{ gap:4px; }
   .pill.nav-small-pill{ font-size:11.5px; padding:7px 12px; min-height:32px; }
@@ -564,7 +565,7 @@
             <h3>⚠️ منطقة الخطر</h3>
             <p class="desc">هذه الإجراءات لا يمكن التراجع عنها.</p>
               <button class="danger-btn" onclick="if(confirm('هل أنت متأكد من حذف الإنجازات؟')) resetAchievements()">🗑️ حذف الإنجازات</button>
-            <button class="danger-btn" onclick="if(confirm('هل أنت متأكد من البدء من جديد؟')) location.reload()">🔄 البدء من جديد</button>
+            <button class="danger-btn" onclick="if(confirm('هل أنت متأكد من البدء من جديد؟')){ try{localStorage.removeItem('rihabQuranAppState_v1');}catch(e){} location.reload(); }">🔄 البدء من جديد</button>
           </div>
         </div>
       </div>
@@ -718,6 +719,36 @@ const trackingStore = {};
 const planSchedules = {};
 let chartDonutPlan=null, chartDonutQuran=null;
 
+/* ================= PERSISTENCE (localStorage) ================= */
+const STORAGE_KEY = 'rihabQuranAppState_v1';
+let saveTimer = null;
+function saveState(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{
+    try{
+      const data = { plans, planIdCounter, trackingStore, planSchedules, activeContext, homeMode, trackMode, trackDir };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }catch(e){ /* storage full or unavailable — fail silently */ }
+  }, 150);
+}
+function loadState(){
+  let raw;
+  try{ raw = localStorage.getItem(STORAGE_KEY); }catch(e){ return false; }
+  if(!raw) return false;
+  try{
+    const data = JSON.parse(raw);
+    plans = data.plans || [];
+    planIdCounter = data.planIdCounter || 0;
+    Object.assign(trackingStore, data.trackingStore || {});
+    Object.assign(planSchedules, data.planSchedules || {});
+    activeContext = data.activeContext || null;
+    homeMode = data.homeMode || 'hero';
+    trackMode = data.trackMode || 'page';
+    trackDir = data.trackDir || 'asc';
+    return true;
+  }catch(e){ return false; }
+}
+
 function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function getPlan(ctx){ const id = ctx.replace('plan:',''); return plans.find(p=>p.id===id); }
 if(window.Chart){ Chart.defaults.font.family = "'IBM Plex Sans Arabic','Tajawal',sans-serif"; Chart.defaults.font.size = 12; }
@@ -741,6 +772,7 @@ function setContext(ctx){
   creatingNewPlan = false;
   activeContext = ctx; homeMode = 'tracking';
   document.querySelectorAll('.context-pill').forEach(b=> b.classList.toggle('active-pill', b.dataset.context === ctx));
+  saveState();
   showPage('home');
 }
 function renderHome(){
@@ -780,6 +812,14 @@ function addPlanPill(plan){
   document.getElementById('planPills').appendChild(btn);
 }
 document.getElementById('motivateText').textContent = motivations[Math.floor(Math.random()*motivations.length)];
+const wasRestored = loadState();
+if(wasRestored){
+  plans.forEach(addPlanPill);
+  if(plans.length) unlockNav();
+  document.querySelectorAll('.context-pill').forEach(b=> b.classList.toggle('active-pill', b.dataset.context === activeContext));
+  document.querySelectorAll('[data-trackmode]').forEach(b=> b.classList.toggle('active', b.dataset.trackmode===trackMode));
+  document.querySelectorAll('[data-trackdir]').forEach(b=> b.classList.toggle('active', b.dataset.trackdir===trackDir));
+}
 renderHome();
 
 /* ================= HIJRI <-> GREGORIAN ================= */
@@ -1084,6 +1124,7 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
     buildPlanSchedule(plan);
     unlockNav();
     creatingNewPlan = false;
+    saveState();
     setContext('plan:'+id);
   } else {
     if(!activeContext || !activeContext.startsWith('plan:')) return;
@@ -1101,6 +1142,7 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
     buildPlanSchedule(plan);
     const pillBtn = document.querySelector(`.context-pill[data-context="plan:${plan.id}"]`);
     if(pillBtn) pillBtn.textContent = '📘 ' + plan.name;
+    saveState();
     const btn = document.getElementById('settingsSaveBtn');
     btn.textContent = '✅ تم الحفظ';
     setTimeout(()=>{ btn.textContent = '💾 حفظ إعدادات الرحلة'; }, 1500);
@@ -1144,9 +1186,10 @@ function buildQuranTable(){
     if(cb.checked) burstConfetti(cb);
     if(trackMode === 'surah') syncSurahToPages(parseInt(cb.dataset.idx), cb.checked);
     if(trackMode === 'page') syncPageToSurahs(parseInt(cb.dataset.idx), cb.checked);
+    saveState();
   }));
-  document.querySelectorAll('#trackingBody select').forEach(sel=> sel.addEventListener('change', ()=>{ store[sel.dataset.idx][sel.dataset.col] = sel.selectedIndex; }));
-  document.querySelectorAll('#trackingBody .note-input').forEach(inp=> inp.addEventListener('input', ()=>{ store[inp.dataset.idx].note = inp.value; }));
+  document.querySelectorAll('#trackingBody select').forEach(sel=> sel.addEventListener('change', ()=>{ store[sel.dataset.idx][sel.dataset.col] = sel.selectedIndex; saveState(); }));
+  document.querySelectorAll('#trackingBody .note-input').forEach(inp=> inp.addEventListener('input', ()=>{ store[inp.dataset.idx].note = inp.value; saveState(); }));
   updateQuranProgress();
 }
 function updateQuranProgress(){
@@ -1155,10 +1198,10 @@ function updateQuranProgress(){
   document.getElementById('progressPct').textContent = (store.length ? Math.round((done/store.length)*100) : 0) + '%';
 }
 document.querySelectorAll('[data-trackmode]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{ document.querySelectorAll('[data-trackmode]').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); trackMode = btn.dataset.trackmode; buildQuranTable(); });
+  btn.addEventListener('click', ()=>{ document.querySelectorAll('[data-trackmode]').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); trackMode = btn.dataset.trackmode; saveState(); buildQuranTable(); });
 });
 document.querySelectorAll('[data-trackdir]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{ document.querySelectorAll('[data-trackdir]').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); trackDir = btn.dataset.trackdir; buildQuranTable(); });
+  btn.addEventListener('click', ()=>{ document.querySelectorAll('[data-trackdir]').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); trackDir = btn.dataset.trackdir; saveState(); buildQuranTable(); });
 });
 
 /* ================= PLAN DAY-SCHEDULE TABLE ================= */
@@ -1279,16 +1322,17 @@ function buildPlanTable(plan){
       <button class="icon-btn trash-btn" data-idx="${i}" title="إعادة تعيين">🗑️</button>`}
     </div>
   </div>`).join('');
-  document.querySelectorAll('#planTableBody select').forEach(sel=> sel.addEventListener('change', ()=>{ rows[sel.dataset.idx][sel.dataset.col] = sel.selectedIndex; }));
-  document.querySelectorAll('#planTableBody .note-input').forEach(inp=> inp.addEventListener('input', ()=>{ rows[inp.dataset.idx].note = inp.value; }));
+  document.querySelectorAll('#planTableBody select').forEach(sel=> sel.addEventListener('change', ()=>{ rows[sel.dataset.idx][sel.dataset.col] = sel.selectedIndex; saveState(); }));
+  document.querySelectorAll('#planTableBody .note-input').forEach(inp=> inp.addEventListener('input', ()=>{ rows[inp.dataset.idx].note = inp.value; saveState(); }));
   document.querySelectorAll('#planTableBody .done-btn').forEach(btn=> btn.addEventListener('click', ()=>{
     const idx = btn.dataset.idx; const r = rows[idx];
     r.done = !r.done;
     if(r.done) burstConfetti(btn);
+    saveState();
     buildPlanTable(plan);
   }));
   document.querySelectorAll('#planTableBody .trash-btn').forEach(btn=> btn.addEventListener('click', ()=>{
-    const idx = btn.dataset.idx; rows[idx].done=false; rows[idx].note=''; rows[idx].hifz=0; buildPlanTable(plan);
+    const idx = btn.dataset.idx; rows[idx].done=false; rows[idx].note=''; rows[idx].hifz=0; saveState(); buildPlanTable(plan);
   }));
 }
 function tathbitRowDone(r){ return r.tasks && r.tasks.length>0 && r.tasks.every(t=>t.done); }
@@ -1335,12 +1379,13 @@ function buildTathbitTable(plan){
       <div data-label="ملاحظات"><input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="ملاحظة..."></div>
     </div>`;
   }).join('');
-  document.querySelectorAll('#tathbitTableBody .note-input').forEach(inp=> inp.addEventListener('input', ()=>{ rows[inp.dataset.idx].note = inp.value; }));
-  document.querySelectorAll('#tathbitTableBody .nisab-inline-input').forEach(inp=> inp.addEventListener('input', ()=>{ rows[inp.dataset.idx].nisab = inp.value; }));
+  document.querySelectorAll('#tathbitTableBody .note-input').forEach(inp=> inp.addEventListener('input', ()=>{ rows[inp.dataset.idx].note = inp.value; saveState(); }));
+  document.querySelectorAll('#tathbitTableBody .nisab-inline-input').forEach(inp=> inp.addEventListener('input', ()=>{ rows[inp.dataset.idx].nisab = inp.value; saveState(); }));
   document.querySelectorAll('#tathbitTableBody .tathbit-task').forEach(cb=> cb.addEventListener('change', ()=>{
     const r = rows[cb.dataset.row];
     r.tasks[cb.dataset.task].done = cb.checked;
     if(cb.checked && tathbitRowDone(r)) burstConfetti(cb);
+    saveState();
     buildTathbitTable(plan);
   }));
   document.querySelectorAll('#tathbitTableBody .chip-remove[data-remove-step]').forEach(x=> x.addEventListener('click', (e)=>{
@@ -1349,6 +1394,7 @@ function buildTathbitTable(plan){
     const stepLabel = rows[parseInt(rowEl.dataset.rowIdx)].tasks[taskIdx].label;
     plan.thursdaySteps = (plan.thursdaySteps||[]).filter(s=>s!==stepLabel);
     buildPlanSchedule(plan);
+    saveState();
     buildTathbitTable(plan);
   }));
   document.querySelectorAll('#tathbitTableBody .thursday-inline-add').forEach(btn=> btn.addEventListener('click', (e)=>{
@@ -1359,6 +1405,7 @@ function buildTathbitTable(plan){
     plan.thursdaySteps = plan.thursdaySteps || [];
     plan.thursdaySteps.push(val);
     buildPlanSchedule(plan);
+    saveState();
     buildTathbitTable(plan);
   }));
 }
