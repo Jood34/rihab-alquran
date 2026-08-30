@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>في رحاب حفظ القرآن الكريم [v11]</title>
+<title>في رحاب حفظ القرآن الكريم [v13]</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Cairo:wght@300;400;600;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -274,7 +274,7 @@
       <div class="nav-group" id="planPills"></div>
       <button class="pill action nav-small-pill" id="navNewPlan">➕ خطة جديدة</button>
     </div>
-    <button class="pill nav-small-pill" id="navQuran">📋 متابعة حفظ القرآن</button>
+    <button class="pill" id="navQuran">📋 متابعة حفظ القرآن</button>
   </div>
 </nav>
 
@@ -479,7 +479,7 @@
         </div>
 
         <div class="field" id="pathTargetField">
-          <div class="field-label"><span class="em">🗺️</span> نطاق الحفظ</div>
+          <div class="field-label"><span class="em">🗺️</span> نطاق الخطة</div>
           <div class="segmented" style="margin-bottom:10px;">
             <div class="seg-btn active" data-settings-mode="جزء">جزء</div>
             <div class="seg-btn" data-settings-mode="سورة">سورة</div>
@@ -723,7 +723,7 @@ const planSchedules = {};
 let chartDonutPlan=null, chartDonutQuran=null;
 
 /* ================= PERSISTENCE (localStorage) ================= */
-const STORAGE_KEY = 'rihabQuranAppState_v1';
+const STORAGE_KEY = 'rihabQuranAppState_v2';
 let saveTimer = null;
 function saveState(){
   clearTimeout(saveTimer);
@@ -836,8 +836,26 @@ function parseLocalDate(str){ return str ? new Date(str+'T00:00:00') : null; }
 let syncingDates = false;
 function wireDateSync(gregId, dayId, monthId, yearId){
   const gEl = document.getElementById(gregId), dEl = document.getElementById(dayId), mEl = document.getElementById(monthId), yEl = document.getElementById(yearId);
-  gEl.addEventListener('change', ()=>{ if(syncingDates || !gEl.value) return; syncingDates = true; const [yy,mm,dd] = gEl.value.split('-').map(Number); const h = gregorianToHijri(new Date(Date.UTC(yy,mm-1,dd))); dEl.value = h.day; mEl.value = h.month; yEl.value = h.year; syncingDates = false; });
-  [dEl, mEl, yEl].forEach(el=>{ el.addEventListener('change', ()=>{ if(syncingDates) return; if(!dEl.value || !mEl.value || !yEl.value) return; syncingDates = true; const g = hijriToGregorian(parseInt(dEl.value), parseInt(mEl.value), parseInt(yEl.value)); gEl.value = fmtDateInput(g); syncingDates = false; }); });
+  gEl.addEventListener('change', ()=>{
+    if(syncingDates || !gEl.value) return;
+    try{
+      syncingDates = true;
+      const [yy,mm,dd] = gEl.value.split('-').map(Number);
+      const h = gregorianToHijri(new Date(Date.UTC(yy,mm-1,dd)));
+      dEl.value = h.day; mEl.value = h.month; yEl.value = h.year;
+    } finally { syncingDates = false; }
+  });
+  [dEl, mEl, yEl].forEach(el=>{
+    el.addEventListener('change', ()=>{
+      if(syncingDates) return;
+      if(!dEl.value || !mEl.value || !yEl.value) return;
+      try{
+        syncingDates = true;
+        const g = hijriToGregorian(parseInt(dEl.value), parseInt(mEl.value), parseInt(yEl.value));
+        gEl.value = fmtDateInput(g);
+      } finally { syncingDates = false; }
+    });
+  });
 }
 function fillHijriSelects(dayId, yearId){
   const dEl = document.getElementById(dayId); for(let i=1;i<=30;i++){ const o=document.createElement('option'); o.value=i; o.textContent=i; dEl.appendChild(o); }
@@ -851,35 +869,45 @@ wireDateSync('settingsEndDateG','settingsHijriDayEnd','settingsHijriMonthEnd','s
 /* ---- day-count <-> end-date sync (accounts for rest days) ---- */
 let syncingDayCount = false;
 function countActiveDaysBetween(startDate, endDate, activeDays){
-  let count=0, cur = new Date(startDate);
-  while(cur <= endDate){ if(activeDays.includes(cur.getDay())) count++; cur = new Date(cur.getTime()+86400000); }
+  if(!activeDays || !activeDays.length) activeDays = [0,1,2,3,4,5,6];
+  let count=0, cur = new Date(startDate), safety=0;
+  while(cur <= endDate && safety < 20000){ if(activeDays.includes(cur.getDay())) count++; cur = new Date(cur.getTime()+86400000); safety++; }
   return count;
 }
 function dateAfterActiveDays(startDate, targetCount, activeDays){
-  let cur = new Date(startDate), counted = 0;
-  while(true){
+  if(!activeDays || !activeDays.length) activeDays = [0,1,2,3,4,5,6];
+  let cur = new Date(startDate), counted = 0, safety = 0;
+  while(safety < 20000){
     if(activeDays.includes(cur.getDay())){ counted++; if(counted>=targetCount) return cur; }
     cur = new Date(cur.getTime()+86400000);
+    safety++;
   }
+  return cur;
 }
 function updateDayCountFromDates(){
   if(syncingDayCount) return;
   const s = document.getElementById('settingsStartDateG').value, e = document.getElementById('settingsEndDateG').value;
   if(s && e){
-    const days = countActiveDaysBetween(parseLocalDate(s), parseLocalDate(e), getSelectedWeekdays());
-    syncingDayCount = true;
-    document.getElementById('settingsDayCount').value = days>0 ? days : '';
-    syncingDayCount = false;
+    try{
+      syncingDayCount = true;
+      const days = countActiveDaysBetween(parseLocalDate(s), parseLocalDate(e), getSelectedWeekdays());
+      document.getElementById('settingsDayCount').value = days>0 ? days : '';
+    } finally {
+      syncingDayCount = false;
+    }
   }
 }
 function recalcEndDateFromCount(){
   const s = document.getElementById('settingsStartDateG').value;
   const dc = parseInt(document.getElementById('settingsDayCount').value);
   if(s && dc>0){
-    syncingDayCount = true;
-    const endDate = dateAfterActiveDays(parseLocalDate(s), dc, getSelectedWeekdays());
-    document.getElementById('settingsEndDateG').value = fmtDateInput(endDate);
-    syncingDayCount = false;
+    try{
+      syncingDayCount = true;
+      const endDate = dateAfterActiveDays(parseLocalDate(s), dc, getSelectedWeekdays());
+      document.getElementById('settingsEndDateG').value = fmtDateInput(endDate);
+    } finally {
+      syncingDayCount = false;
+    }
   }
 }
 document.getElementById('settingsStartDateG').addEventListener('change', ()=>{
@@ -993,9 +1021,11 @@ document.querySelectorAll('#weekdayPicker .chip').forEach(chip=>{
   });
 });
 function getSelectedWeekdays(){
-  return Array.from(document.querySelectorAll('#weekdayPicker .chip.active')).map(c=>parseInt(c.dataset.day));
+  const days = Array.from(document.querySelectorAll('#weekdayPicker .chip.active')).map(c=>parseInt(c.dataset.day));
+  return days.length ? days : [0,1,2,3,4,5,6];
 }
 function setSelectedWeekdays(days){
+  if(!days || !days.length) days = [0,1,2,3,4,5,6];
   document.querySelectorAll('#weekdayPicker .chip').forEach(c=> c.classList.toggle('active', days.includes(parseInt(c.dataset.day))));
 }
 
@@ -1212,20 +1242,25 @@ function buildPlanSchedule(plan){
   if(plan.followType === 'التثبيت'){ buildTathbitSchedule(plan); return; }
   const start = plan.startG ? new Date(plan.startG+'T00:00:00') : new Date();
   const end = plan.endG ? new Date(plan.endG+'T00:00:00') : new Date(start.getTime()+29*86400000);
-  const totalDays = Math.max(1, Math.round((end-start)/86400000)+1);
+  const totalDays = Math.min(3660, Math.max(1, Math.round((end-start)/86400000)+1));
   const pagesPerDay = Math.max(1, Math.round(parseFloat(plan.qty) * (plan.unit==='جزء'?20:plan.unit==='حزب'?10:0.5)));
   const dayNamesAr = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
   const prevRows = planSchedules[plan.id] || [];
   let sequence = [];
   let surahFromIdx = 0, surahToIdx = 113, surahDir = 1;
   if(plan.targetMode === 'جزء'){
-    const fromJ = parseInt(plan.rangeFrom), toJ = parseInt(plan.rangeTo);
+    let fromJ = parseInt(plan.rangeFrom), toJ = parseInt(plan.rangeTo);
+    if(isNaN(fromJ) || fromJ<1 || fromJ>30) fromJ = 1;
+    if(isNaN(toJ) || toJ<1 || toJ>30) toJ = 30;
     if(fromJ <= toJ){ for(let p=juzRanges[fromJ-1][0]; p<=juzRanges[toJ-1][1]; p++) sequence.push(p); }
     else { for(let p=juzRanges[fromJ-1][1]; p>=juzRanges[toJ-1][0]; p--) sequence.push(p); }
   } else {
     surahFromIdx = surahs.indexOf(plan.rangeFrom); surahToIdx = surahs.indexOf(plan.rangeTo);
+    if(surahFromIdx===-1) surahFromIdx = 0;
+    if(surahToIdx===-1) surahToIdx = 113;
     surahDir = surahFromIdx <= surahToIdx ? 1 : -1;
   }
+  if(!sequence.length) sequence = [1];
   const rows = [];
   let cursor = 0;
   const activeDays = (plan.activeDays && plan.activeDays.length) ? plan.activeDays : [0,1,2,3,4,5,6];
@@ -1266,7 +1301,7 @@ function buildPlanSchedule(plan){
 function buildTathbitSchedule(plan){
   const start = plan.startG ? new Date(plan.startG+'T00:00:00') : new Date();
   const end = plan.endG ? new Date(plan.endG+'T00:00:00') : new Date(start.getTime()+29*86400000);
-  const totalDays = Math.max(1, Math.round((end-start)/86400000)+1);
+  const totalDays = Math.min(3660, Math.max(1, Math.round((end-start)/86400000)+1));
   const dayNamesAr = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
   const prevRows = planSchedules[plan.id] || [];
   const rows = [];
