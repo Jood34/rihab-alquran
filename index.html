@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>في رحاب حفظ القرآن الكريم [v13]</title>
+<title>في رحاب حفظ القرآن الكريم [v14]</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Cairo:wght@300;400;600;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -80,7 +80,8 @@
 
   .field{ margin-bottom:22px; }
   .field-label{ display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:700; margin-bottom:9px; }
-  input[type="text"], input[type="date"], select{ width:100%; padding:12px 14px; border-radius:13px; border:1.5px solid var(--line); background:#faf9ff; font-family:var(--font-main); font-size:13.5px; color:var(--ink); outline:none; appearance:none; -webkit-appearance:none; }
+  input[type="text"], select{ width:100%; padding:12px 14px; border-radius:13px; border:1.5px solid var(--line); background:#faf9ff; font-family:var(--font-main); font-size:13.5px; color:var(--ink); outline:none; appearance:none; -webkit-appearance:none; }
+  input[type="date"]{ width:100%; padding:12px 14px; border-radius:13px; border:1.5px solid var(--line); background:#faf9ff; font-family:var(--font-main); font-size:13.5px; color:var(--ink); outline:none; min-height:44px; }
   select{ background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'><path d='M1 1l6 6 6-6' stroke='%235b5678' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>"); background-repeat:no-repeat; background-position: left 14px center; padding-left: 34px; }
   input:focus, select:focus{ border-color:#a9d8ec; box-shadow: 0 0 0 4px #a9d8ec33; }
 
@@ -476,6 +477,10 @@
             🔢 قسّم الكمية تلقائيًا على عدد الأيام
           </label>
           <p class="hint" id="autoDivideResult" style="display:none; margin-top:6px;"></p>
+          <label style="display:flex; align-items:center; gap:8px; margin-top:12px; cursor:pointer; font-size:13px;">
+            <input type="checkbox" id="customTasksToggle" style="width:16px; height:16px;">
+            ➕ إضافة مهام يومية مخصّصة (اختياري، تكتبها أنت بنفسك)
+          </label>
         </div>
 
         <div class="field" id="pathTargetField">
@@ -1062,6 +1067,7 @@ function resetJourneyForm(){
   document.getElementById('settingsQuantity').disabled = false;
   document.getElementById('autoDivideResult').style.display = 'none';
   autoDivideQty = null;
+  document.getElementById('customTasksToggle').checked = false;
 }
 let settingsMinimal = false;
 function openNewPlanForm(){
@@ -1100,6 +1106,7 @@ function loadSettingsForContext(){
     else { sSurahFromEl.value = plan.rangeFrom; sSurahToEl.value = plan.rangeTo; }
     document.getElementById('autoDivideToggle').checked = !!plan.autoDivide;
     computeAutoDivide();
+    document.getElementById('customTasksToggle').checked = !!plan.customTasksEnabled;
     const isTathbit = plan.followType === 'التثبيت';
     document.getElementById('dailyTargetField').style.display = isTathbit ? 'none' : 'block';
     saveBtn.textContent = '💾 حفظ إعدادات الرحلة';
@@ -1136,6 +1143,7 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
   const isTathbit = chosenFollowType === 'التثبيت';
   const autoDivideOn = document.getElementById('autoDivideToggle').checked;
   const finalQty = (autoDivideOn && autoDivideQty!=null) ? autoDivideQty : getSettingsQty();
+  const customTasksOn = document.getElementById('customTasksToggle').checked;
 
   if(creatingNewPlan){
     const id = 'p' + (++planIdCounter);
@@ -1146,6 +1154,7 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
       unit: document.getElementById('settingsUnit').value,
       qty: finalQty,
       autoDivide: autoDivideOn,
+      customTasksEnabled: customTasksOn,
       targetMode: settingsTargetMode,
       rangeFrom, rangeTo,
       target: targetDisplay,
@@ -1168,6 +1177,7 @@ document.getElementById('settingsSaveBtn').addEventListener('click', ()=>{
     plan.unit = document.getElementById('settingsUnit').value;
     plan.qty = finalQty;
     plan.autoDivide = autoDivideOn;
+    plan.customTasksEnabled = customTasksOn;
     plan.activeDays = activeDays;
     plan.targetMode = settingsTargetMode; plan.rangeFrom = rangeFrom; plan.rangeTo = rangeTo;
     plan.target = plan.target && isTathbit ? plan.target : targetDisplay;
@@ -1243,7 +1253,6 @@ function buildPlanSchedule(plan){
   const start = plan.startG ? new Date(plan.startG+'T00:00:00') : new Date();
   const end = plan.endG ? new Date(plan.endG+'T00:00:00') : new Date(start.getTime()+29*86400000);
   const totalDays = Math.min(3660, Math.max(1, Math.round((end-start)/86400000)+1));
-  const pagesPerDay = Math.max(1, Math.round(parseFloat(plan.qty) * (plan.unit==='جزء'?20:plan.unit==='حزب'?10:0.5)));
   const dayNamesAr = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
   const prevRows = planSchedules[plan.id] || [];
   let sequence = [];
@@ -1261,40 +1270,51 @@ function buildPlanSchedule(plan){
     surahDir = surahFromIdx <= surahToIdx ? 1 : -1;
   }
   if(!sequence.length) sequence = [1];
-  const rows = [];
-  let cursor = 0;
   const activeDays = (plan.activeDays && plan.activeDays.length) ? plan.activeDays : [0,1,2,3,4,5,6];
+
+  // Pass 1: figure out which calendar days are rest days vs active (study) days
+  const dayMeta = [];
   for(let i=0;i<totalDays;i++){
     const d = new Date(start.getTime()+i*86400000);
-    let targetLabel = 'الخطة مكتملة 🎉';
-    const isRestDay = !activeDays.includes(d.getDay());
-    if(isRestDay){
-      targetLabel = '🌙 يوم راحة';
-    } else if(plan.targetMode === 'جزء'){
-      const startIdx = cursor % sequence.length;
-      const segs = []; let remaining = pagesPerDay, idx = startIdx;
-      while(remaining>0){ const take = Math.min(remaining, sequence.length-idx); segs.push(sequence.slice(idx, idx+take)); remaining -= take; idx = 0; }
-      cursor += pagesPerDay;
-      const flatPages = segs.flat();
-      const pageLabel = segs.map(seg => seg.length===1 ? `صفحة ${seg[0]}` : `صفحة ${seg[0]}-${seg[seg.length-1]}`).join(' + ');
-      const ayahLabel = flatPages.length <= 3
-        ? flatPages.map(p => pageAyahLabel(p)).join('، ')
-        : `من ${pageAyahLabel(flatPages[0])} إلى ${pageAyahLabel(flatPages[flatPages.length-1])}`;
-      targetLabel = `${ayahLabel} (${pageLabel})`;
-    } else {
-      const totalSurahsInRange = Math.abs(surahToIdx - surahFromIdx) + 1;
-      const perDay = Math.max(1, Math.round(parseFloat(plan.qty)));
-      const idxs = [];
-      for(let k=0;k<perDay;k++){
-        const pos = (cursor+k) % totalSurahsInRange;
-        idxs.push(surahFromIdx + surahDir*pos);
+    dayMeta.push({ d, isRestDay: !activeDays.includes(d.getDay()) });
+  }
+  const activeDayCount = dayMeta.filter(m=>!m.isRestDay).length || 1;
+  const totalSurahsInRange = Math.abs(surahToIdx - surahFromIdx) + 1;
+  const seqLen = plan.targetMode === 'جزء' ? sequence.length : totalSurahsInRange;
+
+  // Pass 2: distribute the WHOLE selected range evenly & exactly across all active days
+  // (cumulative-rounding approach avoids the drift that a fixed per-day amount causes)
+  const rows = [];
+  let activeSeen = 0;
+  for(let i=0;i<totalDays;i++){
+    const { d, isRestDay } = dayMeta[i];
+    let targetLabel = '🌙 يوم راحة';
+    if(!isRestDay){
+      const cursorStart = Math.round(activeSeen * seqLen / activeDayCount);
+      const cursorEnd = Math.round((activeSeen+1) * seqLen / activeDayCount);
+      activeSeen++;
+      if(plan.targetMode === 'جزء'){
+        const slice = sequence.slice(Math.max(0,cursorStart), Math.max(1,cursorEnd));
+        if(slice.length){
+          const pageLabel = slice.length===1 ? `صفحة ${slice[0]}` : `صفحة ${slice[0]}-${slice[slice.length-1]}`;
+          const ayahLabel = slice.length <= 3
+            ? slice.map(p => pageAyahLabel(p)).join('، ')
+            : `من ${pageAyahLabel(slice[0])} إلى ${pageAyahLabel(slice[slice.length-1])}`;
+          targetLabel = `${ayahLabel} (${pageLabel})`;
+        } else {
+          targetLabel = 'الخطة مكتملة 🎉';
+        }
+      } else {
+        const idxs = [];
+        for(let pos=cursorStart; pos<cursorEnd && pos<totalSurahsInRange; pos++){
+          idxs.push(surahFromIdx + surahDir*pos);
+        }
+        targetLabel = idxs.length ? idxs.map(ix=>surahs[ix]).join('، ') : 'الخطة مكتملة 🎉';
       }
-      cursor += perDay;
-      targetLabel = idxs.map(ix=>surahs[ix]).join('، ');
     }
     const prev = prevRows[i];
     rows.push({ date: fmtDateInput(new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))), dayName: dayNamesAr[d.getDay()], target: targetLabel, isRestDay,
-      hifz: prev?prev.hifz:0, note: prev?prev.note:'', done: prev?prev.done:false });
+      hifz: prev?prev.hifz:0, note: prev?prev.note:'', done: prev?prev.done:false, customTasks: prev?(prev.customTasks||[]):[] });
   }
   planSchedules[plan.id] = rows;
 }
@@ -1347,19 +1367,38 @@ function buildPlanTable(plan){
     chip.addEventListener('click', ()=>{ planTableFilter = chip.dataset.filter; buildPlanTable(plan); });
   });
   const visibleRows = rows.map((r,i)=>({r,i})).filter(({r})=> planTableFilter==='all' || (planTableFilter==='done'&&r.done) || (planTableFilter==='remaining'&&!r.done));
-  document.getElementById('planTableBody').innerHTML = visibleRows.map(({r,i})=>`<div class="gtable-row ${r.isRestDay?'rest-row':''}">
+  const showCustomTasks = !!plan.customTasksEnabled;
+  document.getElementById('planTableBody').innerHTML = visibleRows.map(({r,i})=>{
+    let notesCell = `<input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="ملاحظة...">`;
+    if(showCustomTasks && !r.isRestDay){
+      const tasks = r.customTasks || [];
+      const tasksHtml = tasks.map((t,ti)=>`<label style="display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer;">
+        <input type="checkbox" class="custom-task-check" data-row="${i}" data-task="${ti}" ${t.done?'checked':''}> <span style="font-size:11.5px;">${escapeHtml(t.label)}</span>
+        <span class="chip-remove" data-remove-custom="${ti}" style="cursor:pointer; opacity:.5; font-size:11px;">✕</span>
+      </label>`).join('');
+      notesCell += `<div style="width:100%; margin-top:8px; border-top:1px dashed var(--line); padding-top:8px;">
+        <div style="font-size:10.5px; font-weight:700; margin-bottom:2px;">➕ مهامي</div>
+        ${tasksHtml}
+        <div style="display:flex; gap:6px; margin-top:4px;">
+          <input type="text" class="custom-task-input" placeholder="أضف مهمة..." style="flex:1; padding:5px 7px; border-radius:8px; border:1.5px solid var(--line); font-size:11px; font-family:var(--font-main);">
+          <button class="icon-btn custom-task-add" title="إضافة">➕</button>
+        </div>
+      </div>`;
+    }
+    return `<div class="gtable-row ${r.isRestDay?'rest-row':''}" data-row-idx="${i}">
     <div data-label="#">${i+1}</div>
     <div data-label="التاريخ">${r.date}</div>
     <div data-label="اليوم">${r.dayName}</div>
     <div data-label="الهدف اليومي">${escapeHtml(r.target)}</div>
     <div data-label="${isTilawah?'النوع':'مستوى الحفظ'}">${r.isRestDay ? '—' : (isTilawah ? '📖 إنجاز النصاب' : buildLevelSelect(levelsHifz,'hifz',i,r.hifz))}</div>
-    <div data-label="ملاحظات"><input type="text" class="note-input" data-idx="${i}" value="${escapeHtml(r.note)}" placeholder="ملاحظة..."></div>
+    <div data-label="ملاحظات" style="flex-direction:column; align-items:flex-start;">${notesCell}</div>
     <div class="ach-cell gcell-actions" data-label="الإنجاز">
       ${r.isRestDay ? '—' : `
       <button class="icon-btn done-btn" data-idx="${i}" title="${r.done?'تراجع':'إنجاز'}">${r.done?'↩️':'✔️'}</button>
       <button class="icon-btn trash-btn" data-idx="${i}" title="إعادة تعيين">🗑️</button>`}
     </div>
-  </div>`).join('');
+  </div>`;
+  }).join('');
   document.querySelectorAll('#planTableBody select').forEach(sel=> sel.addEventListener('change', ()=>{ rows[sel.dataset.idx][sel.dataset.col] = sel.selectedIndex; saveState(); }));
   document.querySelectorAll('#planTableBody .note-input').forEach(inp=> inp.addEventListener('input', ()=>{ rows[inp.dataset.idx].note = inp.value; saveState(); }));
   document.querySelectorAll('#planTableBody .done-btn').forEach(btn=> btn.addEventListener('click', ()=>{
@@ -1372,6 +1411,32 @@ function buildPlanTable(plan){
   document.querySelectorAll('#planTableBody .trash-btn').forEach(btn=> btn.addEventListener('click', ()=>{
     const idx = btn.dataset.idx; rows[idx].done=false; rows[idx].note=''; rows[idx].hifz=0; saveState(); buildPlanTable(plan);
   }));
+  if(showCustomTasks){
+    document.querySelectorAll('#planTableBody .custom-task-check').forEach(cb=> cb.addEventListener('change', ()=>{
+      const r = rows[cb.dataset.row];
+      r.customTasks[cb.dataset.task].done = cb.checked;
+      if(cb.checked) burstConfetti(cb);
+      saveState();
+    }));
+    document.querySelectorAll('#planTableBody .chip-remove[data-remove-custom]').forEach(x=> x.addEventListener('click', (e)=>{
+      const rowEl = e.target.closest('[data-row-idx]');
+      const idx = parseInt(rowEl.dataset.rowIdx);
+      rows[idx].customTasks.splice(parseInt(x.dataset.removeCustom),1);
+      saveState();
+      buildPlanTable(plan);
+    }));
+    document.querySelectorAll('#planTableBody .custom-task-add').forEach(btn=> btn.addEventListener('click', (e)=>{
+      const rowEl = e.target.closest('[data-row-idx]');
+      const idx = parseInt(rowEl.dataset.rowIdx);
+      const input = rowEl.querySelector('.custom-task-input');
+      const val = input.value.trim();
+      if(!val) return;
+      rows[idx].customTasks = rows[idx].customTasks || [];
+      rows[idx].customTasks.push({label: val, done:false});
+      saveState();
+      buildPlanTable(plan);
+    }));
+  }
 }
 function tathbitRowDone(r){ return r.tasks && r.tasks.length>0 && r.tasks.every(t=>t.done); }
 function buildTathbitTable(plan){
